@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>YouTube Course Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Helps avoid YouTube embed Error 153 on some setups -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <style>
+    :root{
+      --bg:#070b16;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.66);
+      --border: rgba(255,255,255,.14);
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+
+      --accent: #7c3aed;
+      --accent2:#2563eb;
+      --danger: #ef4444;
+
+      --r-xl: 22px;
+      --r: 16px;
+      --r-sm: 12px;
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 520px at 12% 12%, rgba(124,58,237,.28), transparent 60%),
+        radial-gradient(900px 520px at 90% 18%, rgba(37,99,235,.22), transparent 55%),
+        radial-gradient(700px 420px at 55% 95%, rgba(34,197,94,.10), transparent 60%),
+        var(--bg);
+      padding: 18px 14px;
+    }
+
+    .shell{
+      max-width: 1240px;
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      min-height: calc(100vh - 36px);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      border-right: 1px solid var(--border);
+      background: rgba(0,0,0,.10);
+      display:flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .sideTop{
+      padding: 16px 14px 12px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .brand{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+    .logo{
+      width: 36px; height: 36px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 12px 30px rgba(124,58,237,.22);
+      flex: 0 0 auto;
+    }
+    .brand h1{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .brand p{
+      margin:2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .01em;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 12px 32px rgba(124,58,237,.14);
+      transition: transform .12s ease, filter .12s ease;
+      white-space: nowrap;
+    }
+    .btn:hover{ filter: brightness(1.05); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    .btnGhost{
+      background: rgba(255,255,255,.08);
+      border-color: var(--border);
+      box-shadow: none;
+      font-weight: 800;
+    }
+    .btnDanger{
+      background: rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.35);
+      box-shadow: none;
+    }
+
+    .sideBody{
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+    }
+
+    input, textarea, select{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.20);
+      color: var(--text);
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.42); }
+
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      margin: 0 0 6px;
+    }
+
+    .courseList{
+      display:grid;
+      gap: 10px;
+    }
+
+    .courseCard{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(0,0,0,.14);
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .10s ease, background .10s ease, border-color .10s ease;
+    }
+    .courseCard:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+    }
+    .courseCard.active{
+      border-color: rgba(124,58,237,.55);
+      background: rgba(124,58,237,.10);
+    }
+
+    .cover{
+      height: 92px;
+      background: rgba(255,255,255,.06);
+      position: relative;
+    }
+    .cover img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.05);
+    }
+    .cover .fade{
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.55));
+    }
+    .cover .badge{
+      position:absolute;
+      left: 10px; bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      color: rgba(255,255,255,.88);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .courseBody{
+      padding: 10px;
+    }
+
+    .courseTitleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .courseTitle{
+      margin:0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .courseMeta{
+      margin-top: 8px;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      white-space: nowrap;
+    }
+
+    .kebab{
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.9);
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      flex: 0 0 auto;
+    }
+
+    .menuWrap{ position: relative; }
+    .menu{
+      position:absolute;
+      right:0;
+      top: 34px;
+      width: 190px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,12,22,.92);
+      box-shadow: 0 18px 55px rgba(0,0,0,.5);
+      overflow:hidden;
+      display:none;
+      z-index: 50;
+    }
+    .menu.open{ display:block; }
+    .menu button{
+      width:100%;
+      text-align:left;
+      border:0;
+      background: transparent;
+      color: rgba(255,255,255,.9);
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .menu button:hover{ background: rgba(255,255,255,.08); }
+    .menu .danger{ color: rgba(239,68,68,.95); }
+
+    .sideFooter{
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .muted{ color: rgba(255,255,255,.55); font-size: 12px; }
+
+    /* Main */
+    .main{
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+    }
+
+    .mainHeader{
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .mainHeaderLeft{
+      min-width: 260px;
+      flex: 1;
+    }
+    .mainHeaderLeft h2{
+      margin:0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .mainHeaderLeft p{
+      margin:4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.16);
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .content{
+      padding: 16px 18px 20px;
+      overflow: auto;
+    }
+
+    .builderBar{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 14px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.14);
+    }
+
+    textarea{
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    .barRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .modulesHeader{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .modulesHeader h3{
+      margin:0;
+      font-size: 14px;
+      color: rgba(255,255,255,.88);
+      letter-spacing: -0.01em;
+    }
+
+    .module{
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .moduleTop{
+      padding: 12px 12px 10px;
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+
+    .moduleTitle{
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .moduleChip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.14);
+      font-size: 12px;
+      color: rgba(255,255,255,.76);
+      white-space: nowrap;
+    }
+
+    .moduleTitle input{
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .moduleActions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .lessons{
+      padding: 12px;
+      display:grid;
+      gap: 10px;
+    }
+
+    .lesson{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      align-items: stretch;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      background: rgba(0,0,0,.16);
+      overflow: hidden;
+    }
+
+    .thumb{
+      position: relative;
+      background: rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 90px;
+      cursor: pointer;
+    }
+
+    .thumb img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .playBadge{
+      position:absolute;
+      bottom: 8px;
+      left: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      color: rgba(255,255,255,.88);
+      font-size: 12px;
+      font-weight: 900;
+      backdrop-filter: blur(6px);
+    }
+
+    .lessonBody{
+      padding: 12px 12px 12px 0;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .lessonTop{
+      display:flex;
+      gap: 10px;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+    }
+
+    .miniBtn{
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .miniBtn:active{ transform: translateY(1px); }
+    .miniDanger{
+      background: rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.35);
+    }
+
+    .lessonFields{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding-right: 12px;
+    }
+
+    .lessonFields input{
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    .lesson.dragging{
+      opacity: .65;
+      outline: 2px dashed rgba(124,58,237,.45);
+    }
+
+    .empty{
+      margin-top: 10px;
+      border: 1px dashed rgba(255,255,255,.22);
+      border-radius: var(--r);
+      padding: 14px;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.64);
+      line-height: 1.4;
+    }
+
+    /* Player */
+    .playerCard{
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: rgba(0,0,0,.14);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .playerTop{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .playerTopLeft{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 220px;
+      flex: 1;
+    }
+    .playerTopLeft .title{
+      font-weight: 950;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+    .playerTopLeft .sub{
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+    }
+    .playerFrame{
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,.65);
+      font-size: 13px;
+      padding: 10px;
+    }
+    .playerFrame iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      background:#000;
+    }
+
+    /* confirm modal */
+    .modalBack{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modalBack.open{ display:flex; }
+    .modal{
+      width: min(520px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,12,22,.96);
+      box-shadow: 0 24px 90px rgba(0,0,0,.6);
+      overflow: hidden;
+    }
+    .modalHeader{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .modalHeader h4{
+      margin:0;
+      font-size: 14px;
+      font-weight: 950;
+      letter-spacing: -0.01em;
+    }
+    .modalBody{
+      padding: 12px 14px;
+      color: rgba(255,255,255,.75);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .modalActions{
+      padding: 12px 14px 14px;
+      display:flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 980px){
+      .builderBar{
+        grid-template-columns: 1.2fr .8fr;
+        align-items: end;
+      }
+      .lessonFields{ grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 980px){
+      .shell{ grid-template-columns: 1fr; }
+      .sidebar{ border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+
+    @media (max-width: 520px){
+      .lesson{ grid-template-columns: 1fr; }
+      .lessonBody{ padding: 12px; }
+      .lessonFields{ padding-right: 0; }
+      .mainHeaderLeft{ min-width: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sideTop">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <h1>Course Library</h1>
+            <p>Switch between courses</p>
+          </div>
+        </div>
+        <button class="btn btnGhost" id="newCourseBtn">+ New</button>
+      </div>
+
+      <div class="sideBody">
+        <div class="field">
+          <label>Search courses</label>
+          <input id="courseSearch" placeholder="e.g. Excel basics" />
+        </div>
+
+        <div class="courseList" id="courseList"></div>
+      </div>
+
+      <div class="sideFooter">
+        <div class="muted" id="libraryMeta">0 courses</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btnGhost" id="exportLibraryBtn">Export</button>
+          <button class="btn btnGhost" id="importLibraryBtn">Import</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="mainHeader">
+        <div class="mainHeaderLeft">
+          <h2 id="mainTitle">My Course</h2>
+          <p>Build modules & lessons from YouTube links. Click a thumbnail to watch. Use Prev/Next.</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content:flex-end;">
+          <div class="pill" id="statsPill">0 modules • 0 lessons</div>
+          <button class="btn btnGhost" id="startWatchingBtn">Start watching</button>
+          <button class="btn btnGhost" id="exportCourseBtn">Export course</button>
+          <button class="btn btnDanger" id="deleteCourseBtn">Delete course</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- Player -->
+        <div class="playerCard" id="playerCard">
+          <div class="playerTop">
+            <div class="playerTopLeft">
+              <div class="title">Player</div>
+              <div class="sub" id="playerSub">Pick a lesson to start watching.</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap: wrap;">
+              <button class="miniBtn" id="prevBtn">Prev</button>
+              <button class="btn" id="nextBtn">Next</button>
+            </div>
+          </div>
+
+          <div class="playerFrame" id="playerFrame">
+            Add a lesson with a valid YouTube link, then click its thumbnail to watch here.
+          </div>
+        </div>
+
+        <div class="builderBar">
+          <div class="field">
+            <label>Course title</label>
+            <input id="courseTitle" placeholder="e.g. Intro to Data Analysis (YouTube)" />
+          </div>
+
+          <div class="field">
+            <label>Add YouTube links (adds to selected module)</label>
+            <textarea id="urls" placeholder="Paste YouTube URLs (one per line)"></textarea>
+
+            <div class="barRow" style="margin-top:10px;">
+              <div class="field" style="flex: 1; min-width: 220px;">
+                <label>Target module</label>
+                <select id="moduleSelect"></select>
+              </div>
+              <button class="btn" id="addBtn">Add lessons</button>
+              <button class="btn btnGhost" id="addModuleBtn">+ Module</button>
+            </div>
+
+            <div class="muted" style="margin-top:8px;">
+              Course covers use the first lesson thumbnail (no API needed).
+            </div>
+          </div>
+        </div>
+
+        <div class="modulesHeader">
+          <h3>Course outline</h3>
+        </div>
+
+        <div id="modules"></div>
+        <div id="empty" class="empty" style="display:none;">
+          Add a module, then paste YouTube links to start building your course.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modalBack" id="modalBack" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <h4 id="modalTitle">Confirm</h4>
+      </div>
+      <div class="modalBody" id="modalBody">Are you sure?</div>
+      <div class="modalActions">
+        <button class="btn btnGhost" id="modalCancel">Cancel</button>
+        <button class="btn btnDanger" id="modalConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const LIB_KEY = "yt_course_library_v2";
+
+  const els = {
+    // sidebar
+    newCourseBtn: document.getElementById("newCourseBtn"),
+    courseSearch: document.getElementById("courseSearch"),
+    courseList: document.getElementById("courseList"),
+    libraryMeta: document.getElementById("libraryMeta"),
+    exportLibraryBtn: document.getElementById("exportLibraryBtn"),
+    importLibraryBtn: document.getElementById("importLibraryBtn"),
+
+    // main
+    mainTitle: document.getElementById("mainTitle"),
+    statsPill: document.getElementById("statsPill"),
+    startWatchingBtn: document.getElementById("startWatchingBtn"),
+    exportCourseBtn: document.getElementById("exportCourseBtn"),
+    deleteCourseBtn: document.getElementById("deleteCourseBtn"),
+
+    playerSub: document.getElementById("playerSub"),
+    playerFrame: document.getElementById("playerFrame"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+
+    courseTitle: document.getElementById("courseTitle"),
+    urls: document.getElementById("urls"),
+    moduleSelect: document.getElementById("moduleSelect"),
+    addBtn: document.getElementById("addBtn"),
+    addModuleBtn: document.getElementById("addModuleBtn"),
+
+    modules: document.getElementById("modules"),
+    empty: document.getElementById("empty"),
+
+    // modal
+    modalBack: document.getElementById("modalBack"),
+    modalTitle: document.getElementById("modalTitle"),
+    modalBody: document.getElementById("modalBody"),
+    modalCancel: document.getElementById("modalCancel"),
+    modalConfirm: document.getElementById("modalConfirm"),
+  };
+
+  // ---------- modal ----------
+  let modalAction = null;
+  function openModal({ title, body, confirmText="Confirm", onConfirm }){
+    els.modalTitle.textContent = title;
+    els.modalBody.textContent = body;
+    els.modalConfirm.textContent = confirmText;
+    modalAction = onConfirm;
+    els.modalBack.classList.add("open");
+  }
+  function closeModal(){
+    els.modalBack.classList.remove("open");
+    modalAction = null;
+  }
+  els.modalCancel.addEventListener("click", closeModal);
+  els.modalBack.addEventListener("click", (e) => { if (e.target === els.modalBack) closeModal(); });
+  els.modalConfirm.addEventListener("click", () => {
+    if (typeof modalAction === "function") modalAction();
+    closeModal();
+  });
+
+  document.addEventListener("click", () => closeAllMenus());
+
+  // ---------- utils ----------
+  function uid(){
+    return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  }
+
+  function makeCourse(title){
+    return {
+      id: uid(),
+      title: title || "Untitled course",
+      modules: [{ id: uid(), title: "Module 1", lessons: [] }],
+      watchIndex: 0
+    };
+  }
+
+  function seedLib(){
+    const first = makeCourse("My Course");
+    return { activeId: first.id, courses: [first] };
+  }
+
+  function saveLib(){
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    render();
+  }
+
+  function loadLib(){
+    try{
+      const raw = localStorage.getItem(LIB_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.courses)) return null;
+      return parsed;
+    }catch{
+      return null;
+    }
+  }
+
+  function migrateFromV1IfNeeded(){
+    try{
+      const v1 = localStorage.getItem("yt_course_library_v1");
+      if (!v1) return;
+      const parsed = JSON.parse(v1);
+      if (parsed && Array.isArray(parsed.courses) && !localStorage.getItem(LIB_KEY)) {
+        lib = parsed;
+        localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+      }
+    }catch{}
+  }
+
+  function extractVideoId(url){
+    try{
+      const u = new URL(url.trim());
+      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+      if (u.searchParams.get("v")) return u.searchParams.get("v");
+      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2];
+      return null;
+    }catch{
+      return null;
+    }
+  }
+
+  function ytThumb(videoId){
+    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  }
+
+  function ytEmbed(videoId){
+    // Use nocookie + referrerpolicy (helps avoid Error 153 on some setups)
+    return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+  function escapeAttr(str){
+    return escapeHtml(str).replace(/"/g, "&quot;");
+  }
+
+  function getCourseCoverVideoId(course){
+    for (const m of (course.modules || [])) {
+      for (const l of (m.lessons || [])) {
+        if (l && l.videoId) return l.videoId;
+      }
+    }
+    return null;
+  }
+
+  // ✅ normalize everything (prevents crashes when old/bad data is loaded)
+  function normalizeLib(input){
+    const out = (input && typeof input === "object") ? input : { activeId: "", courses: [] };
+    out.courses = Array.isArray(out.courses) ? out.courses : [];
+
+    out.courses = out.courses.map(c => {
+      const course = (c && typeof c === "object") ? c : {};
+      const title = typeof course.title === "string" ? course.title : "Untitled course";
+      const watchIndex = Number.isFinite(course.watchIndex) ? course.watchIndex : 0;
+
+      let modules = Array.isArray(course.modules) ? course.modules : [];
+      modules = modules.map(m => {
+        const mod = (m && typeof m === "object") ? m : {};
+        const mTitle = typeof mod.title === "string" ? mod.title : "Module";
+
+        let lessons = Array.isArray(mod.lessons) ? mod.lessons : [];
+        lessons = lessons.map(l => {
+          const les = (l && typeof l === "object") ? l : {};
+          const url = typeof les.url === "string" ? les.url : "";
+          return {
+            id: typeof les.id === "string" ? les.id : uid(),
+            title: typeof les.title === "string" ? les.title : "Lesson",
+            url,
+            videoId: typeof les.videoId === "string"
+              ? les.videoId
+              : (url ? (extractVideoId(url) || "") : "")
+          };
+        });
+
+        return {
+          id: typeof mod.id === "string" ? mod.id : uid(),
+          title: mTitle,
+          lessons
+        };
+      });
+
+      if (!modules.length) modules = [{ id: uid(), title: "Module 1", lessons: [] }];
+
+      return {
+        id: typeof course.id === "string" ? course.id : uid(),
+        title,
+        modules,
+        watchIndex
+      };
+    });
+
+    if (!out.courses.length) {
+      const first = makeCourse("My Course");
+      out.courses = [first];
+      out.activeId = first.id;
+    }
+
+    if (!out.courses.some(c => c.id === out.activeId)) {
+      out.activeId = out.courses[0].id;
+    }
+
+    // clamp watchIndex
+    for (const c of out.courses){
+      const flat = flattenLessons(c);
+      if (!flat.length) c.watchIndex = 0;
+      else c.watchIndex = Math.max(0, Math.min(c.watchIndex || 0, flat.length - 1));
+    }
+
+    return out;
+  }
+
+  function activeCourse(){
+    return lib.courses.find(c => c.id === lib.activeId);
+  }
+
+  function flattenLessons(course){
+    const out = [];
+    for (const m of (course.modules || [])){
+      for (const l of (m.lessons || [])){
+        // only count lessons that have a usable videoId
+        if (l && l.videoId){
+          out.push({ moduleId: m.id, lessonId: l.id, videoId: l.videoId, title: l.title || "Lesson", url: l.url || "" });
+        }
+      }
+    }
+    return out;
+  }
+
+  // ---------- library actions ----------
+  function newCourse(){
+    const c = makeCourse(`Course ${lib.courses.length + 1}`);
+    lib.courses = [c, ...lib.courses];
+    lib.activeId = c.id;
+    saveLib();
+  }
+
+  function switchCourse(id){
+    lib.activeId = id;
+    saveLib();
+  }
+
+  function duplicateCourse(courseId){
+    const src = lib.courses.find(c => c.id === courseId);
+    if (!src) return;
+
+    const copy = {
+      id: uid(),
+      title: (src.title || "Untitled") + " (Copy)",
+      modules: (src.modules || []).map(m => ({
+        id: uid(),
+        title: m.title || "Module",
+        lessons: (m.lessons || []).map(l => ({
+          id: uid(),
+          videoId: l.videoId || "",
+          url: l.url || "",
+          title: l.title || "Lesson"
+        }))
+      })),
+      watchIndex: 0
+    };
+
+    lib.courses = [copy, ...lib.courses];
+    lib.activeId = copy.id;
+    saveLib();
+  }
+
+  function renameCourse(courseId){
+    const c = lib.courses.find(x => x.id === courseId);
+    if (!c) return;
+    const next = prompt("Rename course:", c.title || "Untitled course");
+    if (!next) return;
+    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: next } : x);
+    saveLib();
+  }
+
+  function deleteCourse(courseId){
+    const c = lib.courses.find(x => x.id === courseId);
+    if (!c) return;
+
+    openModal({
+      title: "Delete course",
+      body: `This will permanently delete "${c.title || "Untitled course"}" from this browser.`,
+      confirmText: "Delete",
+      onConfirm: () => {
+        lib.courses = lib.courses.filter(x => x.id !== courseId);
+        lib = normalizeLib(lib);
+        saveLib();
+      }
+    });
+  }
+
+  function exportLibrary(){
+    const blob = new Blob([JSON.stringify({ version: 2, ...lib }, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "course-library.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importLibrary(){
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try{
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || !Array.isArray(parsed.courses)) return;
+        lib = normalizeLib(parsed);
+        saveLib();
+      }catch{}
+    });
+    input.click();
+  }
+
+  // ---------- course actions ----------
+  function updateCourseTitle(title){
+    lib.courses = lib.courses.map(c => c.id === lib.activeId ? { ...c, title } : c);
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    renderHeaderOnly();
+    renderSidebarOnly();
+  }
+
+  function addModule(){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      const next = { ...c, modules: [...c.modules, { id: uid(), title: `Module ${c.modules.length + 1}`, lessons: [] }] };
+      return next;
+    });
+    saveLib();
+  }
+
+  function removeModule(moduleId){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      let mods = (c.modules || []).filter(m => m.id !== moduleId);
+      if (!mods.length) mods = [{ id: uid(), title: "Module 1", lessons: [] }];
+      return { ...c, modules: mods };
+    });
+    saveLib();
+  }
+
+  function moveModule(moduleId, dir){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      const mods = Array.isArray(c.modules) ? c.modules : [];
+      const i = mods.findIndex(m => m.id === moduleId);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= mods.length) return c;
+      const next = [...mods];
+      const [m] = next.splice(i, 1);
+      next.splice(j, 0, m);
+      return { ...c, modules: next };
+    });
+    saveLib();
+  }
+
+  function updateModuleTitle(moduleId, title){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return { ...c, modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, title } : m) };
+    });
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+  }
+
+  function updateLesson(moduleId, lessonId, patch){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return {
+        ...c,
+        modules: (c.modules || []).map(m => {
+          if (m.id !== moduleId) return m;
+          return { ...m, lessons: (m.lessons || []).map(l => l.id === lessonId ? { ...l, ...patch } : l) };
+        })
+      };
+    });
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+  }
+
+  function removeLesson(moduleId, lessonId){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return {
+        ...c,
+        modules: (c.modules || []).map(m => m.id === moduleId
+          ? { ...m, lessons: (m.lessons || []).filter(l => l.id !== lessonId) }
+          : m)
+      };
+    });
+    saveLib();
+  }
+
+  function moveLesson(moduleId, lessonIndex, dir){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return {
+        ...c,
+        modules: (c.modules || []).map(m => {
+          if (m.id !== moduleId) return m;
+          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
+          const j = lessonIndex + dir;
+          if (j < 0 || j >= lessons.length) return m;
+          const next = [...lessons];
+          const [it] = next.splice(lessonIndex, 1);
+          next.splice(j, 0, it);
+          return { ...m, lessons: next };
+        })
+      };
+    });
+    saveLib();
+  }
+
+  function reorderLessonById(moduleId, fromLessonId, toLessonId){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return {
+        ...c,
+        modules: (c.modules || []).map(m => {
+          if (m.id !== moduleId) return m;
+          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
+          const fromIndex = lessons.findIndex(l => l.id === fromLessonId);
+          const toIndex = lessons.findIndex(l => l.id === toLessonId);
+          if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return m;
+
+          const next = [...lessons];
+          const [moved] = next.splice(fromIndex, 1);
+          next.splice(toIndex, 0, moved);
+          return { ...m, lessons: next };
+        })
+      };
+    });
+    saveLib();
+  }
+
+  function addLessonsToModule(moduleId){
+    const lines = els.urls.value.split("\n").map(s => s.trim()).filter(Boolean);
+    if (!lines.length) return;
+
+    const c = activeCourse();
+    const module = (c?.modules || []).find(m => m.id === moduleId);
+    if (!module) return;
+
+    const existingVideoIds = new Set((module.lessons || []).map(l => l.videoId));
+
+    const toAdd = [];
+    for (const line of lines){
+      const vid = extractVideoId(line);
+      if (!vid) continue;
+      if (existingVideoIds.has(vid)) continue;
+
+      toAdd.push({ id: uid(), videoId: vid, url: line.trim(), title: "New lesson" });
+      existingVideoIds.add(vid);
+    }
+    if (!toAdd.length) return;
+
+    lib.courses = lib.courses.map(course => {
+      if (course.id !== lib.activeId) return course;
+      return {
+        ...course,
+        modules: (course.modules || []).map(m => m.id === moduleId
+          ? { ...m, lessons: [...(m.lessons || []), ...toAdd] }
+          : m)
+      };
+    });
+
+    els.urls.value = "";
+    saveLib();
+  }
+
+  // ---------- sidebar menus ----------
+  function closeAllMenus(){
+    document.querySelectorAll(".menu.open").forEach(m => m.classList.remove("open"));
+  }
+
+  function toggleMenu(menuEl){
+    const isOpen = menuEl.classList.contains("open");
+    closeAllMenus();
+    if (!isOpen) menuEl.classList.add("open");
+  }
+
+  // ---------- Player logic ----------
+  function setWatchIndex(nextIndex){
+    const c = activeCourse();
+    if (!c) return;
+    const flat = flattenLessons(c);
+    if (!flat.length){
+      c.watchIndex = 0;
+    } else {
+      c.watchIndex = Math.max(0, Math.min(nextIndex, flat.length - 1));
+    }
+    // persist
+    lib.courses = lib.courses.map(x => x.id === c.id ? { ...x, watchIndex: c.watchIndex } : x);
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    renderPlayer();
+  }
+
+  function startWatching(){
+    const c = activeCourse();
+    if (!c) return;
+    const flat = flattenLessons(c);
+    if (!flat.length){
+      renderPlayer();
+      return;
+    }
+    setWatchIndex(0);
+  }
+
+  function renderPlayer(){
+    const c = activeCourse();
+    if (!c){
+      els.playerSub.textContent = "Pick a course to start watching.";
+      els.playerFrame.textContent = "No course selected.";
+      return;
+    }
+
+    const flat = flattenLessons(c);
+    if (!flat.length){
+      els.playerSub.textContent = "Pick a lesson to start watching.";
+      els.playerFrame.textContent = "Add a lesson with a valid YouTube link, then click its thumbnail to watch here.";
+      return;
+    }
+
+    const idx = Number.isFinite(c.watchIndex) ? c.watchIndex : 0;
+    const safeIdx = Math.max(0, Math.min(idx, flat.length - 1));
+    const item = flat[safeIdx];
+
+    els.playerSub.textContent = `${safeIdx + 1} of ${flat.length} — ${item.title || "Lesson"}`;
+
+    const src = ytEmbed(item.videoId);
+
+    els.playerFrame.innerHTML = `
+      <iframe
+        src="${escapeAttr(src)}"
+        title="${escapeAttr(item.title || "YouTube lesson")}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+    `;
+  }
+
+  // ---------- rendering ----------
+  function renderHeaderOnly(){
+    const c = activeCourse();
+    els.mainTitle.textContent = c?.title || "My Course";
+    els.courseTitle.value = c?.title || "";
+  }
+
+  function renderSidebarOnly(){
+    const q = (els.courseSearch.value || "").toLowerCase();
+    const courses = lib.courses.filter(c => (c.title || "").toLowerCase().includes(q));
+
+    els.courseList.innerHTML = "";
+    els.libraryMeta.textContent = `${lib.courses.length} course${lib.courses.length===1?"":"s"}`;
+
+    courses.forEach(c => {
+      const modCount = (c.modules || []).length;
+      const lessonCount = (c.modules || []).reduce((a,m)=>a+((m.lessons||[]).length),0);
+      const coverVid = getCourseCoverVideoId(c);
+
+      const card = document.createElement("div");
+      card.className = "courseCard" + (c.id === lib.activeId ? " active" : "");
+
+      card.innerHTML = `
+        <div class="cover">
+          ${coverVid ? `<img src="${escapeAttr(ytThumb(coverVid))}" alt="Course cover" />` : ""}
+          <div class="fade"></div>
+          <div class="badge">${lessonCount} lesson${lessonCount===1?"":"s"}</div>
+        </div>
+
+        <div class="courseBody">
+          <div class="courseTitleRow">
+            <div style="min-width:0;">
+              <div class="courseTitle">${escapeHtml(c.title || "Untitled course")}</div>
+              <div class="courseMeta">
+                <span class="chip">${modCount} module${modCount===1?"":"s"}</span>
+                <span class="chip">${lessonCount} lesson${lessonCount===1?"":"s"}</span>
+              </div>
+            </div>
+
+            <div class="menuWrap">
+              <button class="kebab" data-act="menuBtn" title="Course actions">⋯</button>
+              <div class="menu" data-act="menu">
+                <button data-act="rename">Rename</button>
+                <button data-act="duplicate">Duplicate</button>
+                <button class="danger" data-act="delete">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", (e) => {
+        const clickedMenu = e.target.closest('[data-act="menuBtn"]') || e.target.closest('[data-act="menu"]');
+        if (clickedMenu) return;
+        switchCourse(c.id);
+      });
+
+      const menuBtn = card.querySelector('[data-act="menuBtn"]');
+      const menu = card.querySelector('[data-act="menu"]');
+
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleMenu(menu);
+      });
+      menu.addEventListener("click", (e) => e.stopPropagation());
+
+      card.querySelector('[data-act="rename"]').addEventListener("click", () => {
+        closeAllMenus();
+        renameCourse(c.id);
+      });
+      card.querySelector('[data-act="duplicate"]').addEventListener("click", () => {
+        closeAllMenus();
+        duplicateCourse(c.id);
+      });
+      card.querySelector('[data-act="delete"]').addEventListener("click", () => {
+        closeAllMenus();
+        deleteCourse(c.id);
+      });
+
+      els.courseList.appendChild(card);
+    });
+  }
+
+  function render(){
+    lib = normalizeLib(lib);
+    const c = activeCourse();
+
+    renderHeaderOnly();
+
+    const totalLessons = (c.modules || []).reduce((acc, m) => acc + ((m.lessons || []).length), 0);
+    els.statsPill.textContent = `${(c.modules || []).length} module${(c.modules || []).length===1?"":"s"} • ${totalLessons} lesson${totalLessons===1?"":"s"}`;
+
+    els.moduleSelect.innerHTML = "";
+    (c.modules || []).forEach((m, idx) => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = `${idx + 1}. ${m.title}`;
+      els.moduleSelect.appendChild(opt);
+    });
+
+    els.modules.innerHTML = "";
+    els.empty.style.display = (c.modules || []).length ? "none" : "block";
+
+    (c.modules || []).forEach((m, moduleIndex) => {
+      const mod = document.createElement("section");
+      mod.className = "module";
+      mod.innerHTML = `
+        <div class="moduleTop">
+          <div class="moduleTitle">
+            <span class="moduleChip">Module ${moduleIndex + 1}</span>
+            <input value="${escapeAttr(m.title)}" aria-label="Module title" />
+          </div>
+          <div class="moduleActions">
+            <button class="btn btnGhost" data-act="addOne">+ Lesson</button>
+            <button class="btn btnGhost" data-act="up">↑</button>
+            <button class="btn btnGhost" data-act="down">↓</button>
+            <button class="btn btnDanger" data-act="del">Delete</button>
+          </div>
+        </div>
+        <div class="lessons"></div>
+      `;
+
+      mod.querySelector("input").addEventListener("input", (e) => updateModuleTitle(m.id, e.target.value));
+      mod.querySelector('[data-act="addOne"]').addEventListener("click", () => {
+        const newLesson = { id: uid(), videoId: "", url: "", title: "New lesson" };
+        lib.courses = lib.courses.map(course => {
+          if (course.id !== lib.activeId) return course;
+          return {
+            ...course,
+            modules: (course.modules || []).map(mm => mm.id === m.id
+              ? { ...mm, lessons: [...(mm.lessons || []), newLesson] }
+              : mm)
+          };
+        });
+        saveLib();
+      });
+      mod.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
+      mod.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
+      mod.querySelector('[data-act="del"]').addEventListener("click", () => removeModule(m.id));
+
+      const lessonsEl = mod.querySelector(".lessons");
+
+      if (!(m.lessons || []).length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No lessons yet. Paste YouTube links above and click “Add lessons”, or click “+ Lesson”.";
+        lessonsEl.appendChild(empty);
+      } else {
+        (m.lessons || []).forEach((l, li) => {
+          const hasVid = !!l.videoId;
+          const lesson = document.createElement("div");
+          lesson.className = "lesson";
+          lesson.draggable = true;
+
+          lesson.innerHTML = `
+            <div class="thumb" data-act="thumb">
+              ${hasVid ? `<img src="${escapeAttr(ytThumb(l.videoId))}" alt="YouTube thumbnail" />` : `<div class="mono" style="padding:12px;">Add a YouTube link</div>`}
+              <div class="playBadge">${hasVid ? `Lesson ${li + 1}` : "Draft"}</div>
+            </div>
+
+            <div class="lessonBody">
+              <div class="lessonTop">
+                <div class="mono">${hasVid ? `Video ID: ${escapeHtml(l.videoId)}` : "No video yet"}</div>
+                <div style="display:flex; gap:8px; flex-wrap: wrap;">
+                  <button class="miniBtn" data-act="up">↑</button>
+                  <button class="miniBtn" data-act="down">↓</button>
+                  <button class="miniBtn miniDanger" data-act="del">Delete</button>
+                </div>
+              </div>
+
+              <div class="lessonFields">
+                <div class="field">
+                  <label>Lesson title</label>
+                  <input data-act="title" value="${escapeAttr(l.title || "")}" placeholder="e.g. Understanding offsets" />
+                </div>
+                <div class="field">
+                  <label>YouTube link</label>
+                  <input data-act="url" value="${escapeAttr(l.url || "")}" placeholder="Paste a YouTube URL…" />
+                </div>
+              </div>
+            </div>
+          `;
+
+          // click thumbnail to watch — NO inline JS (prevents your SyntaxError)
+          lesson.querySelector('[data-act="thumb"]').addEventListener("click", () => {
+            const c = activeCourse();
+            const flat = flattenLessons(c);
+            const idx = flat.findIndex(x => x.lessonId === l.id);
+            if (idx >= 0) setWatchIndex(idx);
+          });
+
+          lesson.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
+          lesson.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
+          lesson.querySelector('[data-act="del"]').addEventListener("click", () => removeLesson(m.id, l.id));
+
+          lesson.querySelector('[data-act="title"]').addEventListener("input", (e) => {
+            updateLesson(m.id, l.id, { title: e.target.value });
+            renderPlayer(); // keep player subtitle up to date
+          });
+
+          lesson.querySelector('[data-act="url"]').addEventListener("input", (e) => {
+            const url = e.target.value.trim();
+            const vid = extractVideoId(url);
+            updateLesson(m.id, l.id, { url, videoId: vid || "" });
+            renderSidebarOnly();
+            renderPlayer();
+          });
+
+          lesson.addEventListener("dragstart", (e) => {
+            lesson.classList.add("dragging");
+            e.dataTransfer.setData("text/plain", l.id);
+            e.dataTransfer.effectAllowed = "move";
+          });
+          lesson.addEventListener("dragend", () => lesson.classList.remove("dragging"));
+          lesson.addEventListener("dragover", (e) => e.preventDefault());
+          lesson.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const fromId = e.dataTransfer.getData("text/plain");
+            const toId = l.id;
+            if (!fromId || fromId === toId) return;
+            reorderLessonById(m.id, fromId, toId);
+          });
+
+          lessonsEl.appendChild(lesson);
+        });
+      }
+
+      els.modules.appendChild(mod);
+    });
+
+    renderSidebarOnly();
+    renderPlayer();
+  }
+
+  // ---------- events ----------
+  els.newCourseBtn.addEventListener("click", newCourse);
+  els.courseSearch.addEventListener("input", renderSidebarOnly);
+
+  els.courseTitle.addEventListener("input", (e) => updateCourseTitle(e.target.value));
+
+  els.addBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    const targetModuleId = els.moduleSelect.value || c?.modules?.[0]?.id;
+    if (!targetModuleId) return;
+    addLessonsToModule(targetModuleId);
+  });
+
+  els.addModuleBtn.addEventListener("click", addModule);
+
+  els.startWatchingBtn.addEventListener("click", startWatching);
+  els.prevBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    if (!c) return;
+    setWatchIndex((c.watchIndex || 0) - 1);
+  });
+  els.nextBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    if (!c) return;
+    setWatchIndex((c.watchIndex || 0) + 1);
+  });
+
+  els.exportCourseBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    const blob = new Blob([JSON.stringify({ version: 2, course: c }, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = (c?.title || "course").replace(/[^\w\-]+/g, "_").slice(0,40) + ".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  els.deleteCourseBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    if (!c) return;
+    deleteCourse(c.id);
+  });
+
+  els.exportLibraryBtn.addEventListener("click", exportLibrary);
+  els.importLibraryBtn.addEventListener("click", importLibrary);
+
+  // ---------- init ----------
+  let lib = loadLib() ?? seedLib();
+  migrateFromV1IfNeeded();
+  lib = normalizeLib(lib);
+  localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+  render();
+</script>
+</body>
+</html>
