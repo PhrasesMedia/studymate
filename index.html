@@ -716,6 +716,28 @@
       .lessonRow .urlCol{ grid-column: 1 / -1; }
       .lessonRow .actionsCol{ grid-column: 1 / -1; justify-content:flex-end; }
     }
+  
+    /* Advanced edit panel (collapsed by default) */
+    .editPanel{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      background: rgba(0,0,0,.12);
+      overflow: hidden;
+    }
+    .editSummary{
+      cursor: pointer;
+      padding: 12px;
+      font-weight: 900;
+      color: rgba(255,255,255,.86);
+      list-style: none;
+      user-select: none;
+    }
+    .editSummary::-webkit-details-marker{ display:none; }
+    .editPanel[open] .editSummary{
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+
   </style>
 </head>
 <body>
@@ -793,11 +815,11 @@
           <div class="playerNotes" id="playerNotes" style="display:none;">
             <div class="notesHeader">
               <div class="left">
-                <div class="trophy" title="Bronze trophy is earned the first time you play this lesson.">
-                  🥉 <strong>Bronze</strong> <small id="bronzeText">Not earned</small>
+                <div class="trophy" id="bronzeTrophy" title="Bronze trophy is earned the first time you play this lesson.">
+                  🥉 <strong>Bronze</strong> <small id="bronzeText">Earned</small>
                 </div>
-                <div class="trophy" title="Silver trophy is earned when you click “I understand this”.">
-                  🥈 <strong>Silver</strong> <small id="silverText">Not earned</small>
+                <div class="trophy" id="silverTrophy" title="Silver trophy is earned when you click “I understand this”.">
+                  🥈 <strong>Silver</strong> <small id="silverText">Earned</small>
                 </div>
               </div>
 
@@ -842,14 +864,18 @@
           </div>
         </div>
 
-        <div class="modulesHeader">
-          <h3>Course outline</h3>
-        </div>
+        <details class="editPanel">
+          <summary class="editSummary">Edit course (advanced)</summary>
 
-        <div id="modules"></div>
-        <div id="empty" class="empty" style="display:none;">
-          Add a module, then paste YouTube links to start building your course.
-        </div>
+          <div class="modulesHeader" style="margin-top:12px;">
+            <h3>Course outline</h3>
+          </div>
+
+          <div id="modules"></div>
+          <div id="empty" class="empty" style="display:none;">
+            Add a module, then paste YouTube links to start building your course.
+          </div>
+        </details>
       </div>
     </main>
   </div>
@@ -906,6 +932,8 @@
     notesBox: document.getElementById("notesBox"),
     notesMeta: document.getElementById("notesMeta"),
     understandBtn: document.getElementById("understandBtn"),
+    bronzeTrophy: document.getElementById("bronzeTrophy"),
+    silverTrophy: document.getElementById("silverTrophy"),
     bronzeText: document.getElementById("bronzeText"),
     silverText: document.getElementById("silverText"),
     prevBtn: document.getElementById("prevBtn"),
@@ -1603,8 +1631,12 @@
     // show notes/rewards
     if (els.playerNotes){
       els.playerNotes.style.display = "grid";
-      if (els.bronzeText) els.bronzeText.textContent = current.lesson.watched ? "Earned" : "Not earned";
-      if (els.silverText) els.silverText.textContent = current.lesson.understood ? "Earned" : "Not earned";
+
+      // ✅ Only show trophies once earned
+      const bronzeBadge = els.bronzeTrophy || document.getElementById("bronzeTrophy");
+      const silverBadge = els.silverTrophy || document.getElementById("silverTrophy");
+      if (bronzeBadge) bronzeBadge.style.display = current.lesson.watched ? "inline-flex" : "none";
+      if (silverBadge) silverBadge.style.display = current.lesson.understood ? "inline-flex" : "none";
 
       // Understand button
       if (els.understandBtn){
