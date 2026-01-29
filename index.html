@@ -119,258 +119,427 @@
       box-shadow: none;
       font-weight: 800;
     }
-
     .btnDanger{
       background: rgba(239,68,68,.14);
       border-color: rgba(239,68,68,.35);
-      color: rgba(255,255,255,.92);
       box-shadow: none;
     }
 
     .sideBody{
-      padding: 12px 14px;
-      display: grid;
+      padding: 12px 12px 14px;
+      display:flex;
+      flex-direction: column;
       gap: 10px;
-      overflow:auto;
-      min-height: 0;
-    }
-
-    .field label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      font-weight: 700;
-      letter-spacing: .01em;
+      overflow: auto;
     }
 
     input, textarea, select{
       width: 100%;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.20);
       color: var(--text);
-      padding: 10px 12px;
-      outline:none;
-      font-size: 13px;
-      resize: vertical;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
     }
-    textarea{ min-height: 92px; }
+    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.42); }
 
-    .courseList{
-      display: grid;
-      gap: 10px;
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      margin: 0 0 6px;
     }
+
+    /* Minimal course list */
+    .courseList{ display:grid; gap: 10px; }
 
     .courseRow{
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 16px;
+      background: rgba(0,0,0,.14);
       padding: 10px;
-      background: rgba(0,0,0,.10);
+      cursor: pointer;
+      transition: transform .10s ease, background .10s ease, border-color .10s ease;
       display:flex;
       gap: 10px;
-      align-items: start;
+      align-items:flex-start;
       justify-content: space-between;
-      cursor:pointer;
-      transition: background .12s ease, border-color .12s ease;
-      position: relative;
     }
     .courseRow:hover{
-      background: rgba(255,255,255,.06);
+      transform: translateY(-1px);
       border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
     }
     .courseRow.active{
-      background: rgba(124,58,237,.12);
-      border-color: rgba(124,58,237,.45);
+      border-color: rgba(124,58,237,.55);
+      background: rgba(124,58,237,.10);
     }
 
-    .courseLeft{
-      min-width: 0;
-      flex: 1;
-    }
+    .courseLeft{ min-width:0; flex: 1; }
     .courseName{
-      font-weight: 900;
       font-size: 13px;
+      font-weight: 950;
       letter-spacing: -0.01em;
-      margin-bottom: 6px;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      margin: 0;
+      line-height: 1.2;
+      word-break: break-word;
     }
     .courseMeta{
+      margin-top: 8px;
       display:flex;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
-      color: var(--muted);
+      color: rgba(255,255,255,.68);
       font-size: 12px;
     }
     .chip{
       display:inline-flex;
       align-items:center;
       gap: 6px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.16);
+      padding: 5px 9px;
       border-radius: 999px;
-      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
       white-space: nowrap;
     }
 
     .progressWrap{
       margin-top: 8px;
       display:flex;
-      gap: 8px;
       align-items:center;
-      color: rgba(255,255,255,.78);
+      gap: 8px;
+      color: rgba(255,255,255,.64);
       font-size: 12px;
     }
     .bar{
-      flex: 1;
       height: 8px;
-      background: rgba(255,255,255,.14);
       border-radius: 999px;
-      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      overflow: hidden;
+      flex: 1;
+      min-width: 90px;
     }
     .bar > div{
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--good), var(--accent));
-    }
-
-    .menuWrap{
-      position: relative;
-      flex: 0 0 auto;
+      background: linear-gradient(90deg, rgba(34,197,94,.85), rgba(124,58,237,.85));
     }
 
     .kebab{
-      appearance:none;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      color: rgba(255,255,255,.86);
+      padding: 6px 10px;
       border-radius: 12px;
-      padding: 6px 8px;
-      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.9);
       font-weight: 900;
-      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      flex: 0 0 auto;
     }
 
+    .menuWrap{ position: relative; }
     .menu{
       position:absolute;
-      right: 0;
-      top: 38px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(10,12,22,.96);
+      right:0;
+      top: 34px;
+      width: 190px;
       border-radius: 14px;
-      padding: 6px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(10,12,22,.92);
+      box-shadow: 0 18px 55px rgba(0,0,0,.5);
+      overflow:hidden;
       display:none;
-      min-width: 160px;
-      z-index: 5;
-      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      z-index: 50;
     }
     .menu.open{ display:block; }
     .menu button{
       width:100%;
       text-align:left;
-      padding: 10px 10px;
-      border-radius: 12px;
-      border: 0;
+      border:0;
       background: transparent;
-      color: rgba(255,255,255,.88);
+      color: rgba(255,255,255,.9);
+      padding: 10px 12px;
       cursor:pointer;
       font-weight: 800;
       font-size: 13px;
     }
     .menu button:hover{ background: rgba(255,255,255,.08); }
-    .menu .danger{ color: rgba(255,120,120,.95); }
+    .menu .danger{ color: rgba(239,68,68,.95); }
 
     .sideFooter{
+      padding: 12px;
       border-top: 1px solid var(--border);
-      padding: 12px 14px;
       display:flex;
-      gap: 10px;
+      gap: 8px;
       align-items:center;
       justify-content: space-between;
       flex-wrap: wrap;
     }
-    .muted{ color: var(--muted); font-size: 12px; }
+    .muted{ color: rgba(255,255,255,.55); font-size: 12px; }
 
     /* Main */
     .main{
       min-width: 0;
       display:flex;
       flex-direction: column;
-      background: rgba(0,0,0,.06);
     }
 
     .mainHeader{
+      padding: 16px 18px 12px;
       border-bottom: 1px solid var(--border);
-      padding: 16px 16px 14px;
       display:flex;
-      gap: 12px;
-      align-items: flex-start;
+      gap: 10px;
+      align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
     }
 
     .mainHeaderLeft{
       min-width: 260px;
+      flex: 1;
     }
-    .mainHeader h2{
-      margin: 0;
+    .mainHeaderLeft h2{
+      margin:0;
       font-size: 18px;
       letter-spacing: -0.02em;
+      line-height: 1.1;
     }
-    .mainHeader p{
-      margin: 6px 0 0;
+    .mainHeaderLeft p{
+      margin:4px 0 0;
       color: var(--muted);
       font-size: 12px;
-      max-width: 640px;
-      line-height: 1.35;
+      line-height: 1.3;
     }
 
     .pill{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.16);
-      border-radius: 999px;
       padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.16);
+      color: rgba(255,255,255,.78);
       font-size: 12px;
-      color: rgba(255,255,255,.84);
       white-space: nowrap;
     }
 
     .content{
-      padding: 14px 16px 18px;
-      overflow:auto;
-      min-height: 0;
+      padding: 16px 18px 20px;
+      overflow: auto;
+    }
+
+    .builderBar{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 14px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.14);
+    }
+
+    textarea{
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    .barRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .modulesHeader{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .modulesHeader h3{
+      margin:0;
+      font-size: 14px;
+      color: rgba(255,255,255,.88);
+      letter-spacing: -0.01em;
+    }
+
+    .module{
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .moduleTop{
+      padding: 12px 12px 10px;
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+
+    .moduleTitle{
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .moduleChip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.14);
+      font-size: 12px;
+      color: rgba(255,255,255,.76);
+      white-space: nowrap;
+    }
+
+    .moduleTitle input{
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .moduleActions{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    /* Minimal lessons list (no video cards) */
+    .lessons{
+      padding: 12px;
+      display:grid;
+      gap: 10px;
+    }
+
+    .lessonRow{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      background: rgba(0,0,0,.16);
+      padding: 10px;
+      display:grid;
+      grid-template-columns: 28px 1fr 1.1fr auto;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .lessonRow.dragging{
+      opacity: .65;
+      outline: 2px dashed rgba(124,58,237,.45);
+    }
+
+    .check{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .check input{
+      width: 18px; height: 18px;
+      accent-color: var(--good);
+    }
+
+    .miniLine{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+    }
+
+    .miniBtn{
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.92);
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .miniBtn:active{ transform: translateY(1px); }
+    .miniDanger{
+      background: rgba(239,68,68,.14);
+      border-color: rgba(239,68,68,.35);
+    }
+    .miniPrimary{
+      background: linear-gradient(90deg, rgba(124,58,237,.85), rgba(37,99,235,.85));
+      border-color: rgba(255,255,255,.12);
+    }
+    .miniDisabled{
+      opacity: .45;
+      pointer-events:none;
+    }
+
+    .empty{
+      margin-top: 10px;
+      border: 1px dashed rgba(255,255,255,.22);
+      border-radius: var(--r);
+      padding: 14px;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.64);
+      line-height: 1.4;
     }
 
     /* Player */
     .player{
       margin-top: 12px;
       border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--r-xl);
-      background: rgba(0,0,0,.16);
-      overflow:hidden;
+      border-radius: var(--r);
+      background: rgba(0,0,0,.14);
+      overflow: hidden;
     }
+
     .playerTop{
       padding: 12px 12px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
       display:flex;
       gap: 10px;
       align-items:center;
       justify-content: space-between;
       flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+
+    .playerTopLeft{
+      min-width: 200px;
     }
     .playerTopLeft .title{
-      font-weight: 900;
+      font-weight: 950;
       font-size: 13px;
-      margin-bottom: 4px;
       letter-spacing: -0.01em;
+      margin: 0;
     }
     .playerTopLeft .sub{
-      color: var(--muted);
+      margin-top: 4px;
+      color: rgba(255,255,255,.68);
       font-size: 12px;
       display:flex;
       gap: 8px;
@@ -378,50 +547,29 @@
       align-items:center;
     }
 
-    .miniBtn{
-      appearance:none;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.9);
-      border-radius: 12px;
-      padding: 8px 10px;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 12px;
-    }
-    .miniBtn:hover{ background: rgba(255,255,255,.10); }
-    .miniPrimary{
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-color: transparent;
-      box-shadow: 0 14px 40px rgba(124,58,237,.12);
-    }
-    .miniDisabled{
-      opacity: .42;
-      pointer-events:none;
-    }
-
     .playerFrame{
-      position: relative;
-      background: #000;
-      width: 100%;
-      aspect-ratio: 16/9;
+      background: rgba(255,255,255,.04);
+      aspect-ratio: 16 / 9;
       display:flex;
       align-items:center;
       justify-content:center;
+      padding: 10px;
     }
     .playerFrame iframe{
       width: 100%;
       height: 100%;
       border: 0;
+      border-radius: 12px;
+      background: rgba(0,0,0,.45);
     }
     .playerEmpty{
-      color: rgba(255,255,255,.78);
-      font-weight: 800;
+      color: rgba(255,255,255,.65);
       font-size: 13px;
-      padding: 16px;
       text-align:center;
-      line-height: 1.3;
+      line-height: 1.4;
+      padding: 18px;
     }
+
 
     .playerNotes{
       padding: 12px;
@@ -461,268 +609,115 @@
 
     .playerList{
       padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.10);
       display:grid;
-      gap: 10px;
+      gap: 8px;
+      background: rgba(0,0,0,.10);
     }
 
     .lessonPick{
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.12);
-      border-radius: 16px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.14);
       padding: 10px;
       display:flex;
       gap: 10px;
       align-items:center;
       justify-content: space-between;
       cursor:pointer;
-      transition: background .12s ease, border-color .12s ease;
-    }
-    .lessonPick:hover{
-      background: rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.16);
     }
     .lessonPick.active{
-      background: rgba(124,58,237,.12);
-      border-color: rgba(124,58,237,.45);
+      border-color: rgba(124,58,237,.55);
+      background: rgba(124,58,237,.10);
     }
-
+    .lessonPickLeft{ min-width:0; }
     .lessonPickTitle{
-      font-weight: 900;
       font-size: 13px;
-      margin-bottom: 6px;
-      letter-spacing: -0.01em;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-weight: 900;
+      margin: 0;
+      line-height: 1.2;
+      word-break: break-word;
     }
     .lessonPickMeta{
-      display:flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
-      align-items:center;
-    }
-
-    .miniLine{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      font-size: 12px;
-      color: rgba(255,255,255,.82);
-      font-weight: 900;
-    }
-    .miniLine input{ width: 16px; height: 16px; }
-
-    /* Builder + Modules */
-    .builderBar{
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--r-xl);
-      background: rgba(0,0,0,.14);
-      padding: 12px;
-      display:grid;
-      gap: 10px;
-    }
-    .barRow{
-      display:flex;
-      gap: 10px;
-      align-items:flex-end;
-      flex-wrap: wrap;
-    }
-
-    .modulesHeader{
-      margin-top: 14px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .modulesHeader h3{
-      margin: 0;
-      font-size: 14px;
-      letter-spacing: -0.01em;
-    }
-
-    .module{
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--r-xl);
-      background: rgba(0,0,0,.12);
-      overflow:hidden;
-    }
-    .moduleTop{
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .moduleTopLeft{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      min-width: 0;
-      flex: 1;
-    }
-    .moduleTitle{
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing: -0.01em;
-      min-width: 0;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .moduleBody{
-      padding: 12px;
-      display:grid;
-      gap: 10px;
-    }
-
-    .lessonRow{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.12);
-      border-radius: 16px;
-      padding: 10px;
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items:center;
-    }
-
-    .lessonRowLeft{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      min-width:0;
-    }
-    .lessonRowTitle{
-      min-width:0;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 900;
-      font-size: 13px;
-    }
-    .lessonRowSub{
       margin-top: 4px;
-      color: var(--muted);
       font-size: 12px;
-      display:flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-
-    .lessonActions{
+      color: rgba(255,255,255,.65);
       display:flex;
       gap: 8px;
-      align-items:center;
-      justify-content:flex-end;
       flex-wrap: wrap;
+      align-items:center;
     }
 
-    .iconBtn{
-      appearance:none;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
+    a.link{
       color: rgba(255,255,255,.9);
-      border-radius: 12px;
-      padding: 8px 10px;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 12px;
-      line-height: 1;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 8px;
-    }
-    .iconBtn:hover{ background: rgba(255,255,255,.10); }
-    .iconBtn.danger{
-      border-color: rgba(239,68,68,.35);
-      background: rgba(239,68,68,.14);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
-    .empty{
-      border: 1px dashed rgba(255,255,255,.20);
-      border-radius: var(--r-xl);
-      padding: 16px;
-      text-align:center;
-      color: rgba(255,255,255,.78);
-      font-weight: 800;
-      background: rgba(0,0,0,.10);
-      margin-top: 12px;
-    }
-
-    /* Modal */
+    /* confirm modal */
     .modalBack{
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.62);
+      background: rgba(0,0,0,.55);
       display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
     }
     .modalBack.open{ display:flex; }
     .modal{
       width: min(520px, 100%);
       border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.16);
       background: rgba(10,12,22,.96);
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 30px 90px rgba(0,0,0,.65);
-      overflow:hidden;
+      box-shadow: 0 24px 90px rgba(0,0,0,.6);
+      overflow: hidden;
     }
     .modalHeader{
       padding: 14px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
+      border-bottom: 1px solid rgba(255,255,255,.12);
     }
     .modalHeader h4{
       margin:0;
       font-size: 14px;
+      font-weight: 950;
       letter-spacing: -0.01em;
     }
     .modalBody{
-      padding: 14px;
-      color: rgba(255,255,255,.86);
+      padding: 12px 14px;
+      color: rgba(255,255,255,.75);
       font-size: 13px;
-      line-height: 1.35;
+      line-height: 1.4;
     }
     .modalActions{
       padding: 12px 14px 14px;
-      border-top: 1px solid rgba(255,255,255,.10);
       display:flex;
       gap: 10px;
-      justify-content:flex-end;
+      justify-content: flex-end;
       flex-wrap: wrap;
     }
 
-    .link{
-      color: rgba(180,200,255,.96);
-      text-decoration:none;
-      font-weight: 900;
-    }
-    .link:hover{ text-decoration: underline; }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      color: rgba(255,255,255,.78);
+    @media (min-width: 980px){
+      .builderBar{
+        grid-template-columns: 1.2fr .8fr;
+        align-items: end;
+      }
     }
 
     @media (max-width: 980px){
       .shell{ grid-template-columns: 1fr; }
       .sidebar{ border-right: 0; border-bottom: 1px solid var(--border); }
+      .lessonRow{ grid-template-columns: 28px 1fr 1fr auto; }
+    }
+
+    @media (max-width: 720px){
+      .lessonRow{ grid-template-columns: 28px 1fr; }
+      .lessonRow .urlCol{ grid-column: 1 / -1; }
+      .lessonRow .actionsCol{ grid-column: 1 / -1; justify-content:flex-end; }
     }
   </style>
 </head>
-
 <body>
   <div class="shell">
     <!-- Sidebar -->
@@ -731,8 +726,8 @@
         <div class="brand">
           <div class="logo"></div>
           <div>
-            <h1>Course Library</h1>
-            <p>Switch between courses</p>
+            <h1>Study Mate</h1>
+            <p>Build + track YouTube courses</p>
           </div>
         </div>
         <button class="btn btnGhost" id="newCourseBtn">+ New</button>
@@ -794,6 +789,7 @@
             </div>
           </div>
 
+          
           <div class="playerNotes" id="playerNotes" style="display:none;">
             <div class="notesHeader">
               <div class="left">
@@ -884,26 +880,13 @@
     exportLibraryBtn: document.getElementById("exportLibraryBtn"),
     importLibraryBtn: document.getElementById("importLibraryBtn"),
 
-    // header
+    // main header
     mainTitle: document.getElementById("mainTitle"),
     statsPill: document.getElementById("statsPill"),
     progressPill: document.getElementById("progressPill"),
     startWatchingBtn: document.getElementById("startWatchingBtn"),
     exportCourseBtn: document.getElementById("exportCourseBtn"),
     deleteCourseBtn: document.getElementById("deleteCourseBtn"),
-
-    // player
-    playerSub: document.getElementById("playerSub"),
-    prevBtn: document.getElementById("prevBtn"),
-    nextBtn: document.getElementById("nextBtn"),
-    playerFrame: document.getElementById("playerFrame"),
-    playerList: document.getElementById("playerList"),
-    playerNotes: document.getElementById("playerNotes"),
-    notesBox: document.getElementById("notesBox"),
-    notesMeta: document.getElementById("notesMeta"),
-    understandBtn: document.getElementById("understandBtn"),
-    bronzeText: document.getElementById("bronzeText"),
-    silverText: document.getElementById("silverText"),
 
     // builder
     courseTitle: document.getElementById("courseTitle"),
@@ -914,6 +897,20 @@
     modules: document.getElementById("modules"),
     empty: document.getElementById("empty"),
 
+    // player
+    playerSub: document.getElementById("playerSub"),
+    playerFrame: document.getElementById("playerFrame"),
+    playerEmpty: document.getElementById("playerEmpty"),
+    playerList: document.getElementById("playerList"),
+    playerNotes: document.getElementById("playerNotes"),
+    notesBox: document.getElementById("notesBox"),
+    notesMeta: document.getElementById("notesMeta"),
+    understandBtn: document.getElementById("understandBtn"),
+    bronzeText: document.getElementById("bronzeText"),
+    silverText: document.getElementById("silverText"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+
     // modal
     modalBack: document.getElementById("modalBack"),
     modalTitle: document.getElementById("modalTitle"),
@@ -922,14 +919,40 @@
     modalConfirm: document.getElementById("modalConfirm"),
   };
 
-  // ---------- state ----------
-  let lib = loadLib();
-  let playingLessonId = "";
-  let notesTimer = null;
+  // ---------- modal ----------
+  let modalAction = null;
+  function openModal({ title, body, confirmText="Confirm", onConfirm }){
+    els.modalTitle.textContent = title;
+    els.modalBody.textContent = body;
+    els.modalConfirm.textContent = confirmText;
+    modalAction = onConfirm;
+    els.modalBack.classList.add("open");
+  }
+  function closeModal(){
+    els.modalBack.classList.remove("open");
+    modalAction = null;
+  }
+  els.modalCancel.addEventListener("click", closeModal);
+  els.modalBack.addEventListener("click", (e) => { if (e.target === els.modalBack) closeModal(); });
+  els.modalConfirm.addEventListener("click", () => {
+    if (typeof modalAction === "function") modalAction();
+    closeModal();
+  });
 
-  // ---------- utilities ----------
+  document.addEventListener("click", () => closeAllMenus());
+
+  // ---------- utils ----------
   function uid(){
-    return Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+    return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+  function escapeAttr(str){
+    return escapeHtml(str).replace(/"/g, "&quot;");
   }
 
   function extractVideoId(url){
@@ -938,101 +961,44 @@
       if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
       if (u.searchParams.get("v")) return u.searchParams.get("v");
       if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2];
-      return "";
-    }catch{ return ""; }
-  }
-
-  function ytEmbed(videoId){
-    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
-  }
-  function ytWatch(videoId){
-    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
-  }
-
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-  function escapeAttr(s){
-    return escapeHtml(s).replaceAll("`","&#096;");
-  }
-
-  function loadLib(){
-    try{
-      const raw = localStorage.getItem(LIB_KEY);
-      const parsed = raw ? JSON.parse(raw) : null;
-      return normalizeLib(parsed);
+      return null;
     }catch{
-      return normalizeLib(null);
+      return null;
     }
   }
 
-  function normalizeLib(raw){
-    const base = { activeId: "", courses: [] };
-    if (!raw || !Array.isArray(raw.courses)) return seedLib(base);
-
-    const courses = raw.courses
-      .filter(c => c && typeof c.title === "string" && Array.isArray(c.modules))
-      .map(c => {
-        const modules = (c.modules || [])
-          .filter(m => m && typeof m.title === "string" && Array.isArray(m.lessons))
-          .map(m => {
-            const lessons = (m.lessons || [])
-              .filter(les => les && (typeof les.url === "string" || typeof les.videoId === "string"))
-              .map(les => {
-                const url = typeof les.url === "string" ? les.url : "";
-                const vid = typeof les.videoId === "string" ? les.videoId : extractVideoId(url);
-                return {
-                  id: typeof les.id === "string" ? les.id : uid(),
-                  title: typeof les.title === "string" ? les.title : "Lesson",
-                  url,
-                  videoId: vid || "",
-                  completed: !!les.completed,
-                  watched: !!les.watched,
-                  understood: !!les.understood,
-                  notes: typeof les.notes === "string" ? les.notes : ""
-                };
-              });
-            return {
-              id: typeof m.id === "string" ? m.id : uid(),
-              title: m.title,
-              lessons
-            };
-          });
-
-        return {
-          id: typeof c.id === "string" ? c.id : uid(),
-          title: c.title,
-          lastLessonId: typeof c.lastLessonId === "string" ? c.lastLessonId : "",
-          modules: modules.length ? modules : [{ id: uid(), title:"Module 1", lessons: [] }]
-        };
-      });
-
-    const activeId = (typeof raw.activeId === "string" && courses.some(c => c.id === raw.activeId))
-      ? raw.activeId
-      : (courses[0]?.id || "");
-
-    return { activeId, courses };
+  function ytEmbed(videoId){
+    // modestbranding is not guaranteed, but harmless. rel=0 keeps related vids closer.
+    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?rel=0&modestbranding=1`;
   }
-
-  function seedLib(base){
-    const first = makeCourse("Index.html");
-    base.courses = [first, makeCourse("Cooking 101"), makeCourse("Parenting 101"), makeCourse("Landscaping 101")];
-    base.activeId = base.courses[0].id;
-    return base;
+  function ytWatch(videoId){
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
   }
 
   function makeCourse(title){
     return {
       id: uid(),
       title: title || "Untitled course",
-      lastLessonId: "",
+      lastLessonId: "",               // for resume
       modules: [{ id: uid(), title: "Module 1", lessons: [] }]
     };
+  }
+
+  function seedLib(){
+    const first = makeCourse("My Course");
+    return { activeId: first.id, courses: [first] };
+  }
+
+  function loadLib(){
+    try{
+      const raw = localStorage.getItem(LIB_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.courses)) return null;
+      return parsed;
+    }catch{
+      return null;
+    }
   }
 
   function saveLib(){
@@ -1040,77 +1006,115 @@
     render();
   }
 
-  // ---------- derived helpers ----------
+  // ✅ normalize saved data so .modules/.lessons exist + tracking fields exist
+  function normalizeLib(input){
+    const out = (input && typeof input === "object") ? input : { activeId: "", courses: [] };
+    out.courses = Array.isArray(out.courses) ? out.courses : [];
+
+    out.courses = out.courses.map(c => {
+      const course = (c && typeof c === "object") ? c : {};
+      const title = typeof course.title === "string" ? course.title : "Untitled course";
+      const lastLessonId = typeof course.lastLessonId === "string" ? course.lastLessonId : "";
+
+      let modules = Array.isArray(course.modules) ? course.modules : [];
+      modules = modules.map(m => {
+        const mod = (m && typeof m === "object") ? m : {};
+        const mTitle = typeof mod.title === "string" ? mod.title : "Module";
+
+        let lessons = Array.isArray(mod.lessons) ? mod.lessons : [];
+        lessons = lessons.map(l => {
+          const les = (l && typeof l === "object") ? l : {};
+          const url = typeof les.url === "string" ? les.url : "";
+          const vid = typeof les.videoId === "string" ? les.videoId : (url ? (extractVideoId(url) || "") : "");
+          return {
+            id: typeof les.id === "string" ? les.id : uid(),
+            title: typeof les.title === "string" ? les.title : "Lesson",
+            url,
+            videoId: vid || "",
+            completed: !!les.completed,
+            watched: !!les.watched,
+            understood: !!les.understood,
+            notes: typeof les.notes === "string" ? les.notes : ""
+          };
+        });
+
+        return {
+          id: typeof mod.id === "string" ? mod.id : uid(),
+          title: mTitle,
+          lessons
+        };
+      });
+
+      if (!modules.length) modules = [{ id: uid(), title: "Module 1", lessons: [] }];
+
+      return {
+        id: typeof course.id === "string" ? course.id : uid(),
+        title,
+        lastLessonId,
+        modules
+      };
+    });
+
+    if (!out.courses.length) {
+      const first = makeCourse("My Course");
+      out.courses = [first];
+      out.activeId = first.id;
+    }
+
+    if (!out.courses.some(c => c.id === out.activeId)) {
+      out.activeId = out.courses[0].id;
+    }
+
+    return out;
+  }
+
   function activeCourse(){
-    return (lib.courses || []).find(c => c.id === lib.activeId) || lib.courses[0] || makeCourse("My Course");
+    return lib.courses.find(c => c.id === lib.activeId);
   }
 
   function flattenLessons(course){
-    const out = [];
-    (course?.modules || []).forEach(m => {
-      (m.lessons || []).forEach(l => {
-        out.push({
+    const list = [];
+    (course.modules || []).forEach((m, mi) => {
+      (m.lessons || []).forEach((l, li) => {
+        list.push({
           moduleId: m.id,
-          moduleTitle: m.title,
+          moduleIndex: mi,
           lessonId: l.id,
-          lesson: l
+          lessonIndex: li,
+          lesson: l,
+          moduleTitle: m.title
         });
       });
     });
-    return out;
+    return list;
   }
 
   function courseStats(course){
     const flat = flattenLessons(course);
     const total = flat.length;
     const done = flat.filter(x => x.lesson.completed).length;
-    const pct = total ? Math.round((done/total)*100) : 0;
+    const pct = total ? Math.round((done / total) * 100) : 0;
     return { total, done, pct };
   }
 
-  // ---------- modal ----------
-  let modalResolve = null;
-  function confirmModal(title, body, confirmText="Confirm"){
-    els.modalTitle.textContent = title;
-    els.modalBody.textContent = body;
-    els.modalConfirm.textContent = confirmText;
-    els.modalBack.classList.add("open");
-    return new Promise(res => modalResolve = res);
-  }
-  function closeModal(value){
-    els.modalBack.classList.remove("open");
-    const r = modalResolve;
-    modalResolve = null;
-    if (r) r(value);
-  }
+  // ---------- state ----------
+  let lib = normalizeLib(loadLib() ?? seedLib());
+  localStorage.setItem(LIB_KEY, JSON.stringify(lib));
 
-  els.modalCancel.addEventListener("click", () => closeModal(false));
-  els.modalBack.addEventListener("click", (e) => {
-    if (e.target === els.modalBack) closeModal(false);
-  });
-
-  els.modalConfirm.addEventListener("click", () => closeModal(true));
+  let playingLessonId = ""; // UI state only
 
   // ---------- library actions ----------
   function newCourse(){
-    const c = makeCourse("New course");
+    const c = makeCourse(`Course ${lib.courses.length + 1}`);
     lib.courses = [c, ...lib.courses];
     lib.activeId = c.id;
     playingLessonId = "";
     saveLib();
   }
 
-  function switchCourse(courseId){
-    lib.activeId = courseId;
+  function switchCourse(id){
+    lib.activeId = id;
     playingLessonId = "";
-    saveLib();
-  }
-
-  function renameCourse(courseId){
-    const c = lib.courses.find(x => x.id === courseId);
-    const title = prompt("Rename course", c?.title || "");
-    if (title == null) return;
-    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: title.trim() || "Untitled course" } : x);
     saveLib();
   }
 
@@ -1144,30 +1148,37 @@
     saveLib();
   }
 
-  async function deleteCourse(courseId){
+  function renameCourse(courseId){
     const c = lib.courses.find(x => x.id === courseId);
     if (!c) return;
-
-    const ok = await confirmModal("Delete course?", `Delete "${c.title}" permanently?`, "Delete");
-    if (!ok) return;
-
-    lib.courses = lib.courses.filter(x => x.id !== courseId);
-    if (!lib.courses.length){
-      const n = makeCourse("My Course");
-      lib.courses = [n];
-      lib.activeId = n.id;
-    }else if (lib.activeId === courseId){
-      lib.activeId = lib.courses[0].id;
-    }
-    playingLessonId = "";
+    const next = prompt("Rename course:", c.title || "Untitled course");
+    if (!next) return;
+    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: next } : x);
     saveLib();
   }
 
+  function deleteCourse(courseId){
+    const c = lib.courses.find(x => x.id === courseId);
+    if (!c) return;
+
+    openModal({
+      title: "Delete course",
+      body: `This will permanently delete "${c.title || "Untitled course"}" from this browser.`,
+      confirmText: "Delete",
+      onConfirm: () => {
+        lib.courses = lib.courses.filter(x => x.id !== courseId);
+        lib = normalizeLib(lib);
+        playingLessonId = "";
+        saveLib();
+      }
+    });
+  }
+
   function exportLibrary(){
-    const blob = new Blob([JSON.stringify(lib, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ version: 1, ...lib }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "study_mate_library.json";
+    a.download = "study-mate-library.json";
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -1224,6 +1235,7 @@
     });
     input.click();
   }
+
 
   // ---------- course actions ----------
   function updateCourseTitle(title){
@@ -1302,6 +1314,7 @@
         modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, lessons: (m.lessons || []).filter(l => l.id !== lessonId) } : m)
       };
 
+      // if we removed what we were watching, clear player
       if (next.lastLessonId === lessonId) next.lastLessonId = "";
       return next;
     });
@@ -1323,6 +1336,28 @@
           const next = [...lessons];
           const item = next.splice(lessonIndex, 1)[0];
           next.splice(j, 0, item);
+          return { ...m, lessons: next };
+        })
+      };
+    });
+    saveLib();
+  }
+
+  function reorderLessonById(moduleId, fromLessonId, toLessonId){
+    lib.courses = lib.courses.map(c => {
+      if (c.id !== lib.activeId) return c;
+      return {
+        ...c,
+        modules: (c.modules || []).map(m => {
+          if (m.id !== moduleId) return m;
+          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
+          const fromIndex = lessons.findIndex(l => l.id === fromLessonId);
+          const toIndex = lessons.findIndex(l => l.id === toLessonId);
+          if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return m;
+
+          const next = [...lessons];
+          const moved = next.splice(fromIndex, 1)[0];
+          next.splice(toIndex, 0, moved);
           return { ...m, lessons: next };
         })
       };
@@ -1373,6 +1408,7 @@
 
     // Bronze trophy: earn on first play
     if (!found.lesson.watched){
+      // updateLesson will persist + re-render
       updateLesson(found.moduleId, found.lessonId, { watched: true });
     }
 
@@ -1423,24 +1459,12 @@
     els.mainTitle.textContent = c && c.title ? c.title : "My Course";
     els.courseTitle.value = c && c.title ? c.title : "";
 
-    const modCount = (c.modules || []).length;
-    const lessonCount = flattenLessons(c).length;
-    els.statsPill.textContent = `${modCount} module${modCount===1?"":"s"} • ${lessonCount} lesson${lessonCount===1?"":"s"}`;
+    const totalModules = (c.modules || []).length;
+    const totalLessons = flattenLessons(c).length;
+    els.statsPill.textContent = `${totalModules} module${totalModules===1?"":"s"} • ${totalLessons} lesson${totalLessons===1?"":"s"}`;
 
-    const { pct } = courseStats(c);
-    els.progressPill.textContent = `${pct}% complete`;
-
-    // module select
-    els.moduleSelect.innerHTML = "";
-    (c.modules || []).forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m.id;
-      opt.textContent = m.title || "Module";
-      els.moduleSelect.appendChild(opt);
-    });
-
-    // empty state
-    els.empty.style.display = flattenLessons(c).length ? "none" : "block";
+    const { total, done, pct } = courseStats(c);
+    els.progressPill.textContent = total ? `${pct}% complete • ${done}/${total}` : `0% complete`;
   }
 
   function renderSidebarOnly(){
@@ -1519,6 +1543,7 @@
     const c = activeCourse();
     const flat = flattenLessons(c).filter(x => x.lesson.videoId);
 
+    // build the list
     els.playerList.innerHTML = "";
 
     if (!flat.length){
@@ -1532,10 +1557,12 @@
       empty.textContent = "Add a lesson with a valid YouTube link, then click it below to watch here.";
       els.playerFrame.appendChild(empty);
 
+      // hide notes/rewards panel when nothing is selected
       if (els.playerNotes) els.playerNotes.style.display = "none";
       return;
     }
 
+    // resolve current
     let idx = flat.findIndex(x => x.lessonId === playingLessonId);
     if (idx < 0) idx = c.lastLessonId ? flat.findIndex(x => x.lessonId === c.lastLessonId) : -1;
     if (idx < 0) idx = 0;
@@ -1543,6 +1570,7 @@
     const current = flat[idx];
     const lessonTitle = (current.lesson.title || "Lesson").trim() || "Lesson";
 
+    // player top
     const doneMark = current.lesson.completed ? "✅ Completed" : "Not completed";
     const bronze = current.lesson.watched ? "🥉" : "—";
     const silver = current.lesson.understood ? "🥈" : "—";
@@ -1559,9 +1587,11 @@
       <a class="link" href="${escapeAttr(ytWatch(current.lesson.videoId))}" target="_blank" rel="noreferrer">Open on YouTube</a>
     `;
 
+    // prev/next disabled states
     if (idx <= 0) els.prevBtn.classList.add("miniDisabled"); else els.prevBtn.classList.remove("miniDisabled");
     if (idx >= flat.length - 1) els.nextBtn.classList.add("miniDisabled"); else els.nextBtn.classList.remove("miniDisabled");
 
+    // render iframe
     els.playerFrame.innerHTML = `
       <iframe
         title="YouTube player"
@@ -1570,11 +1600,13 @@
         allowfullscreen></iframe>
     `;
 
+    // show notes/rewards
     if (els.playerNotes){
       els.playerNotes.style.display = "grid";
       if (els.bronzeText) els.bronzeText.textContent = current.lesson.watched ? "Earned" : "Not earned";
       if (els.silverText) els.silverText.textContent = current.lesson.understood ? "Earned" : "Not earned";
 
+      // Understand button
       if (els.understandBtn){
         if (current.lesson.understood){
           els.understandBtn.textContent = "Understood ✓";
@@ -1590,21 +1622,36 @@
         };
       }
 
+      // Notes box
       if (els.notesBox){
         els.notesBox.value = current.lesson.notes || "";
         els.notesBox.oninput = (e) => {
           const val = e.target.value;
-          if (els.notesMeta) els.notesMeta.textContent = "Saving…";
 
+          if (els.notesMeta) els.notesMeta.textContent = "Saving…";
           if (notesTimer) clearTimeout(notesTimer);
+
           notesTimer = setTimeout(() => {
-            updateLesson(current.moduleId, current.lessonId, { notes: val });
+            // ✅ Update in-memory without re-rendering the player/iframe
+            const course = activeCourse();
+            for (const m of (course.modules || [])) {
+              if (m.id !== current.moduleId) continue;
+              const lesson = (m.lessons || []).find(l => l.id === current.lessonId);
+              if (!lesson) break;
+              lesson.notes = val;
+              break;
+            }
+
+            // ✅ Persist only (no render)
+            localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+
             if (els.notesMeta) els.notesMeta.textContent = "Notes are saved automatically.";
           }, 250);
         };
       }
     }
 
+    // list of lessons under player
     flat.forEach((x, i) => {
       const item = document.createElement("div");
       const active = x.lessonId === current.lessonId;
@@ -1650,134 +1697,52 @@
       els.playerList.appendChild(item);
     });
 
+    // keep state aligned
     playingLessonId = current.lessonId;
     lib.courses = lib.courses.map(course => course.id === lib.activeId ? { ...course, lastLessonId: current.lessonId } : course);
     localStorage.setItem(LIB_KEY, JSON.stringify(lib));
   }
 
   function render(){
-    renderHeaderOnly();
-    renderSidebarOnly();
-    renderPlayerOnly();
-
+    lib = normalizeLib(lib);
     const c = activeCourse();
+    renderHeaderOnly();
+
+    // module select
+    els.moduleSelect.innerHTML = "";
+    (c.modules || []).forEach((m, idx) => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = `${idx + 1}. ${m.title}`;
+      els.moduleSelect.appendChild(opt);
+    });
+
+    // modules/lessons
     els.modules.innerHTML = "";
+    els.empty.style.display = (c.modules || []).length ? "none" : "block";
 
-    (c.modules || []).forEach((m, mi) => {
-      const wrap = document.createElement("div");
-      wrap.className = "module";
+    (c.modules || []).forEach((m, moduleIndex) => {
+      const mod = document.createElement("section");
+      mod.className = "module";
 
-      wrap.innerHTML = `
+      mod.innerHTML = `
         <div class="moduleTop">
-          <div class="moduleTopLeft">
-            <div class="moduleTitle">${escapeHtml(m.title || "Module")}</div>
-            <span class="chip">${(m.lessons||[]).length} lesson${(m.lessons||[]).length===1?"":"s"}</span>
+          <div class="moduleTitle">
+            <span class="moduleChip">Module ${moduleIndex + 1}</span>
+            <input value="${escapeAttr(m.title)}" aria-label="Module title" />
           </div>
-
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap: wrap; justify-content:flex-end;">
-            <button class="iconBtn" data-act="up">↑</button>
-            <button class="iconBtn" data-act="down">↓</button>
-            <button class="iconBtn" data-act="rename">Rename</button>
-            <button class="iconBtn danger" data-act="delete">Delete</button>
+          <div class="moduleActions">
+            <button class="btn btnGhost" data-act="addOne">+ Lesson</button>
+            <button class="btn btnGhost" data-act="up">↑</button>
+            <button class="btn btnGhost" data-act="down">↓</button>
+            <button class="btn btnDanger" data-act="del">Delete</button>
           </div>
         </div>
-
-        <div class="moduleBody" data-body="body"></div>
+        <div class="lessons"></div>
       `;
 
-      wrap.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
-      wrap.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
-      wrap.querySelector('[data-act="rename"]').addEventListener("click", () => {
-        const title = prompt("Rename module", m.title || "");
-        if (title == null) return;
-        updateModuleTitle(m.id, title.trim() || "Module");
-      });
-      wrap.querySelector('[data-act="delete"]').addEventListener("click", async () => {
-        const ok = await confirmModal("Delete module?", `Delete "${m.title}" and its lessons?`, "Delete");
-        if (!ok) return;
-        removeModule(m.id);
-      });
-
-      const body = wrap.querySelector('[data-body="body"]');
-
-      if (!(m.lessons || []).length){
-        const empty = document.createElement("div");
-        empty.className = "muted";
-        empty.textContent = "No lessons yet. Paste YouTube links above to add lessons to this module.";
-        body.appendChild(empty);
-      }else{
-        (m.lessons || []).forEach((l, li) => {
-          const row = document.createElement("div");
-          row.className = "lessonRow";
-
-          const rewardBadge = `${l.watched ? "🥉" : ""}${l.understood ? " 🥈" : ""}`.trim() || "—";
-
-          row.innerHTML = `
-            <div class="lessonRowLeft">
-              <label class="miniLine" title="Mark completed">
-                <input type="checkbox" ${l.completed ? "checked" : ""} data-act="done" />
-                <span>Done</span>
-              </label>
-
-              <div style="min-width:0;">
-                <div class="lessonRowTitle">${escapeHtml(l.title || "Lesson")}</div>
-                <div class="lessonRowSub">
-                  <span class="chip">Rewards: ${escapeHtml(rewardBadge)}</span>
-                  <a class="link" href="${escapeAttr(ytWatch(l.videoId||""))}" target="_blank" rel="noreferrer">YouTube</a>
-                  <span class="mono">${escapeHtml(l.videoId || "")}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="lessonActions">
-              <button class="iconBtn" data-act="up">↑</button>
-              <button class="iconBtn" data-act="down">↓</button>
-              <button class="iconBtn" data-act="watch">Watch</button>
-              <button class="iconBtn" data-act="edit">Edit</button>
-              <button class="iconBtn danger" data-act="del">Delete</button>
-            </div>
-          `;
-
-          row.querySelector('[data-act="done"]').addEventListener("change", (e) => {
-            updateLesson(m.id, l.id, { completed: !!e.target.checked });
-          });
-
-          row.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
-          row.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
-          row.querySelector('[data-act="watch"]').addEventListener("click", () => setPlaying(l.id));
-
-          row.querySelector('[data-act="edit"]').addEventListener("click", () => {
-            const title = prompt("Lesson title", l.title || "");
-            if (title == null) return;
-            const url = prompt("YouTube URL", l.url || "");
-            if (url == null) return;
-            const vid = extractVideoId(url);
-            updateLesson(m.id, l.id, { title: title.trim() || "Lesson", url: url.trim(), videoId: vid || "" });
-          });
-
-          row.querySelector('[data-act="del"]').addEventListener("click", async () => {
-            const ok = await confirmModal("Delete lesson?", `Delete "${l.title}"?`, "Delete");
-            if (!ok) return;
-            removeLesson(m.id, l.id);
-          });
-
-          body.appendChild(row);
-        });
-      }
-
-      // add quick lesson
-      const addWrap = document.createElement("div");
-      addWrap.className = "lessonRow";
-      addWrap.innerHTML = `
-        <div class="lessonRowLeft">
-          <div class="lessonRowTitle">+ Add blank lesson</div>
-          <div class="lessonRowSub">Creates an empty lesson you can edit.</div>
-        </div>
-        <div class="lessonActions">
-          <button class="iconBtn miniPrimary" data-act="add">Add</button>
-        </div>
-      `;
-      addWrap.querySelector('[data-act="add"]').addEventListener("click", () => {
+      mod.querySelector("input").addEventListener("input", (e) => updateModuleTitle(m.id, e.target.value));
+      mod.querySelector('[data-act="addOne"]').addEventListener("click", () => {
         const newLesson = { id: uid(), videoId: "", url: "", title: "New lesson", completed: false, watched: false, understood: false, notes: "" };
         lib.courses = lib.courses.map(course => {
           if (course.id !== lib.activeId) return course;
@@ -1785,43 +1750,144 @@
         });
         saveLib();
       });
-      body.appendChild(addWrap);
+      mod.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
+      mod.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
+      mod.querySelector('[data-act="del"]').addEventListener("click", () => removeModule(m.id));
 
-      els.modules.appendChild(wrap);
+      const lessonsEl = mod.querySelector(".lessons");
+
+      if (!(m.lessons || []).length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No lessons yet. Paste YouTube links above and click “Add lessons”, or click “+ Lesson”.";
+        lessonsEl.appendChild(empty);
+      } else {
+        (m.lessons || []).forEach((l, li) => {
+          const row = document.createElement("div");
+          row.className = "lessonRow";
+          row.draggable = true;
+
+          const displayId = l.videoId ? `ID: ${l.videoId}` : "No video yet";
+          const safeTitle = escapeAttr(l.title || "");
+          const safeUrl = escapeAttr(l.url || "");
+
+          row.innerHTML = `
+            <div class="check">
+              <input type="checkbox" ${l.completed ? "checked" : ""} title="Mark completed" />
+            </div>
+
+            <div style="min-width:0;">
+              <div class="miniLine">
+                <span class="mono">${li + 1}.</span>
+                <span class="mono">${escapeHtml(displayId)}</span>
+              </div>
+              <input data-act="title" value="${safeTitle}" placeholder="Lesson title" style="margin-top:8px;" />
+            </div>
+
+            <div class="urlCol" style="min-width:0;">
+              <div class="miniLine"><span class="mono">YouTube link</span></div>
+              <input data-act="url" value="${safeUrl}" placeholder="Paste a YouTube URL…" style="margin-top:8px;" />
+            </div>
+
+            <div class="actionsCol" style="display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap: wrap;">
+              <button class="miniBtn" data-act="up">↑</button>
+              <button class="miniBtn" data-act="down">↓</button>
+              <button class="miniBtn" data-act="play">Play</button>
+              <button class="miniBtn miniDanger" data-act="del">Delete</button>
+            </div>
+          `;
+
+          // completion
+          row.querySelector('input[type="checkbox"]').addEventListener("change", (e) => {
+            updateLesson(m.id, l.id, { completed: !!e.target.checked });
+          });
+
+          // title/url edits
+          row.querySelector('[data-act="title"]').addEventListener("input", (e) => {
+            updateLesson(m.id, l.id, { title: e.target.value });
+          });
+
+          row.querySelector('[data-act="url"]').addEventListener("input", (e) => {
+            const url = e.target.value.trim();
+            const vid = extractVideoId(url);
+            updateLesson(m.id, l.id, { url, videoId: vid || "" });
+          });
+
+          // move/delete/play
+          row.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
+          row.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
+          row.querySelector('[data-act="del"]').addEventListener("click", () => removeLesson(m.id, l.id));
+          row.querySelector('[data-act="play"]').addEventListener("click", () => {
+            if (!l.videoId) return;
+            setPlaying(l.id);
+          });
+
+          // drag reorder
+          row.addEventListener("dragstart", (e) => {
+            row.classList.add("dragging");
+            e.dataTransfer.setData("text/plain", l.id);
+            e.dataTransfer.effectAllowed = "move";
+          });
+          row.addEventListener("dragend", () => row.classList.remove("dragging"));
+          row.addEventListener("dragover", (e) => e.preventDefault());
+          row.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const fromId = e.dataTransfer.getData("text/plain");
+            const toId = l.id;
+            if (!fromId || fromId === toId) return;
+            reorderLessonById(m.id, fromId, toId);
+          });
+
+          lessonsEl.appendChild(row);
+        });
+      }
+
+      els.modules.appendChild(mod);
     });
+
+    renderPlayerOnly();
+    renderSidebarOnly();
   }
 
-  // ---------- wire up ----------
+  // ---------- events ----------
   els.newCourseBtn.addEventListener("click", newCourse);
-  els.exportLibraryBtn.addEventListener("click", exportLibrary);
-  els.importLibraryBtn.addEventListener("click", importLibrary);
+  els.courseSearch.addEventListener("input", renderSidebarOnly);
 
   els.courseTitle.addEventListener("input", (e) => updateCourseTitle(e.target.value));
 
-  els.addBtn.addEventListener("click", () => addLessonsToModule(els.moduleSelect.value));
+  els.addBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    const targetModuleId = els.moduleSelect.value || (c.modules && c.modules[0] && c.modules[0].id);
+    if (!targetModuleId) return;
+    addLessonsToModule(targetModuleId);
+  });
+
   els.addModuleBtn.addEventListener("click", addModule);
 
   els.startWatchingBtn.addEventListener("click", resume);
-
   els.prevBtn.addEventListener("click", () => playerPrevNext(-1));
   els.nextBtn.addEventListener("click", () => playerPrevNext(+1));
 
   els.exportCourseBtn.addEventListener("click", () => {
     const c = activeCourse();
-    const blob = new Blob([JSON.stringify(c, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ version: 1, course: c }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${(c.title || "course").replaceAll(/[^a-z0-9]+/gi, "_").toLowerCase()}.json`;
+    a.download = (c && c.title ? c.title : "course").replace(/[^\w\-]+/g, "_").slice(0,40) + ".json";
     a.click();
     URL.revokeObjectURL(a.href);
   });
 
-  els.deleteCourseBtn.addEventListener("click", () => deleteCourse(lib.activeId));
+  els.deleteCourseBtn.addEventListener("click", () => {
+    const c = activeCourse();
+    if (!c) return;
+    deleteCourse(c.id);
+  });
 
-  document.addEventListener("click", () => closeAllMenus());
-  els.courseSearch.addEventListener("input", renderSidebarOnly);
+  els.exportLibraryBtn.addEventListener("click", exportLibrary);
+  els.importLibraryBtn.addEventListener("click", importLibrary);
 
-  // ---------- init ----------
+  // initial
   render();
 </script>
 </body>
