@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>YouTube Course Builder</title>
+  <title>Study Mate</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Helps avoid YouTube embed Error 153 on some setups -->
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
-
   <style>
     :root{
       --bg:#070b16;
@@ -21,6 +17,7 @@
       --accent: #7c3aed;
       --accent2:#2563eb;
       --danger: #ef4444;
+      --good: #22c55e;
 
       --r-xl: 22px;
       --r: 16px;
@@ -122,556 +119,606 @@
       box-shadow: none;
       font-weight: 800;
     }
+
     .btnDanger{
       background: rgba(239,68,68,.14);
       border-color: rgba(239,68,68,.35);
+      color: rgba(255,255,255,.92);
       box-shadow: none;
     }
 
     .sideBody{
-      padding: 12px 12px 14px;
-      display:flex;
-      flex-direction: column;
+      padding: 12px 14px;
+      display: grid;
       gap: 10px;
-      overflow: auto;
+      overflow:auto;
+      min-height: 0;
+    }
+
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      letter-spacing: .01em;
     }
 
     input, textarea, select{
       width: 100%;
       border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
       color: var(--text);
-      padding: 11px 12px;
-      outline: none;
-      font-size: 14px;
+      padding: 10px 12px;
+      outline:none;
+      font-size: 13px;
+      resize: vertical;
     }
-    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.42); }
-
-    .field label{
-      display:block;
-      font-size: 12px;
-      color: rgba(255,255,255,.62);
-      margin: 0 0 6px;
-    }
+    textarea{ min-height: 92px; }
 
     .courseList{
-      display:grid;
+      display: grid;
       gap: 10px;
     }
 
-    .courseCard{
+    .courseRow{
       border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      background: rgba(0,0,0,.14);
-      cursor: pointer;
-      overflow: hidden;
-      transition: transform .10s ease, background .10s ease, border-color .10s ease;
-    }
-    .courseCard:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.18);
-      background: rgba(255,255,255,.06);
-    }
-    .courseCard.active{
-      border-color: rgba(124,58,237,.55);
-      background: rgba(124,58,237,.10);
-    }
-
-    .cover{
-      height: 92px;
-      background: rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(0,0,0,.10);
+      display:flex;
+      gap: 10px;
+      align-items: start;
+      justify-content: space-between;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease;
       position: relative;
     }
-    .cover img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display:block;
-      filter: saturate(1.05);
+    .courseRow:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.18);
     }
-    .cover .fade{
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.55));
+    .courseRow.active{
+      background: rgba(124,58,237,.12);
+      border-color: rgba(124,58,237,.45);
     }
-    .cover .badge{
-      position:absolute;
-      left: 10px; bottom: 10px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.35);
-      backdrop-filter: blur(6px);
-      color: rgba(255,255,255,.88);
-      font-size: 12px;
+
+    .courseLeft{
+      min-width: 0;
+      flex: 1;
+    }
+    .courseName{
       font-weight: 900;
-    }
-
-    .courseBody{
-      padding: 10px;
-    }
-
-    .courseTitleRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .courseTitle{
-      margin:0;
       font-size: 13px;
-      font-weight: 900;
       letter-spacing: -0.01em;
-      line-height: 1.2;
-      word-break: break-word;
+      margin-bottom: 6px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .courseMeta{
-      margin-top: 8px;
       display:flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      color: rgba(255,255,255,.68);
+      color: var(--muted);
       font-size: 12px;
     }
     .chip{
       display:inline-flex;
       align-items:center;
       gap: 6px;
-      padding: 5px 9px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.14);
-      font-size: 12px;
-      color: rgba(255,255,255,.72);
+      padding: 4px 8px;
       white-space: nowrap;
     }
 
-    .kebab{
-      padding: 6px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.9);
-      font-weight: 900;
-      cursor: pointer;
-      user-select: none;
+    .progressWrap{
+      margin-top: 8px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+    }
+    .bar{
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+      overflow:hidden;
+    }
+    .bar > div{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--good), var(--accent));
+    }
+
+    .menuWrap{
+      position: relative;
       flex: 0 0 auto;
     }
 
-    .menuWrap{ position: relative; }
+    .kebab{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.86);
+      border-radius: 12px;
+      padding: 6px 8px;
+      cursor:pointer;
+      font-weight: 900;
+      line-height: 1;
+    }
+
     .menu{
       position:absolute;
-      right:0;
-      top: 34px;
-      width: 190px;
+      right: 0;
+      top: 38px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,12,22,.96);
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(10,12,22,.92);
-      box-shadow: 0 18px 55px rgba(0,0,0,.5);
-      overflow:hidden;
+      padding: 6px;
       display:none;
-      z-index: 50;
+      min-width: 160px;
+      z-index: 5;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
     }
     .menu.open{ display:block; }
     .menu button{
       width:100%;
       text-align:left;
-      border:0;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 0;
       background: transparent;
-      color: rgba(255,255,255,.9);
-      padding: 10px 12px;
+      color: rgba(255,255,255,.88);
       cursor:pointer;
       font-weight: 800;
       font-size: 13px;
     }
     .menu button:hover{ background: rgba(255,255,255,.08); }
-    .menu .danger{ color: rgba(239,68,68,.95); }
+    .menu .danger{ color: rgba(255,120,120,.95); }
 
     .sideFooter{
-      padding: 12px;
       border-top: 1px solid var(--border);
+      padding: 12px 14px;
       display:flex;
-      gap: 8px;
+      gap: 10px;
       align-items:center;
       justify-content: space-between;
       flex-wrap: wrap;
     }
-    .muted{ color: rgba(255,255,255,.55); font-size: 12px; }
+    .muted{ color: var(--muted); font-size: 12px; }
 
     /* Main */
     .main{
       min-width: 0;
       display:flex;
       flex-direction: column;
+      background: rgba(0,0,0,.06);
     }
 
     .mainHeader{
-      padding: 16px 18px 12px;
       border-bottom: 1px solid var(--border);
+      padding: 16px 16px 14px;
       display:flex;
-      gap: 10px;
-      align-items: center;
+      gap: 12px;
+      align-items: flex-start;
       justify-content: space-between;
       flex-wrap: wrap;
     }
 
     .mainHeaderLeft{
       min-width: 260px;
-      flex: 1;
     }
-    .mainHeaderLeft h2{
-      margin:0;
+    .mainHeader h2{
+      margin: 0;
       font-size: 18px;
       letter-spacing: -0.02em;
-      line-height: 1.1;
     }
-    .mainHeaderLeft p{
-      margin:4px 0 0;
+    .mainHeader p{
+      margin: 6px 0 0;
       color: var(--muted);
       font-size: 12px;
-      line-height: 1.3;
+      max-width: 640px;
+      line-height: 1.35;
     }
 
     .pill{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.16);
-      color: rgba(255,255,255,.78);
+      border-radius: 999px;
+      padding: 8px 10px;
       font-size: 12px;
+      color: rgba(255,255,255,.84);
       white-space: nowrap;
     }
 
     .content{
-      padding: 16px 18px 20px;
-      overflow: auto;
+      padding: 14px 16px 18px;
+      overflow:auto;
+      min-height: 0;
     }
 
-    .builderBar{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 14px;
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.14);
-    }
-
-    textarea{
-      min-height: 90px;
-      resize: vertical;
-      line-height: 1.35;
-    }
-
-    .barRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
-
-    .modulesHeader{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
+    /* Player */
+    .player{
       margin-top: 12px;
-    }
-
-    .modulesHeader h3{
-      margin:0;
-      font-size: 14px;
-      color: rgba(255,255,255,.88);
-      letter-spacing: -0.01em;
-    }
-
-    .module{
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      background: rgba(255,255,255,.06);
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .moduleTop{
-      padding: 12px 12px 10px;
-      display:flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.12);
-    }
-
-    .moduleTitle{
-      display:flex;
-      gap: 10px;
-      align-items: center;
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .moduleChip{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.14);
-      font-size: 12px;
-      color: rgba(255,255,255,.76);
-      white-space: nowrap;
-    }
-
-    .moduleTitle input{
-      font-weight: 900;
-      letter-spacing: -0.01em;
-      padding: 10px 12px;
-      border-radius: 12px;
-    }
-
-    .moduleActions{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .lessons{
-      padding: 12px;
-      display:grid;
-      gap: 10px;
-    }
-
-    .lesson{
-      display:grid;
-      grid-template-columns: 160px 1fr;
-      gap: 12px;
-      align-items: stretch;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--r-xl);
       background: rgba(0,0,0,.16);
-      overflow: hidden;
+      overflow:hidden;
     }
-
-    .thumb{
-      position: relative;
-      background: rgba(255,255,255,.06);
+    .playerTop{
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
       display:flex;
+      gap: 10px;
       align-items:center;
-      justify-content:center;
-      min-height: 90px;
-      cursor: pointer;
-    }
-
-    .thumb img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    .playBadge{
-      position:absolute;
-      bottom: 8px;
-      left: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.35);
-      color: rgba(255,255,255,.88);
-      font-size: 12px;
-      font-weight: 900;
-      backdrop-filter: blur(6px);
-    }
-
-    .lessonBody{
-      padding: 12px 12px 12px 0;
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .lessonTop{
-      display:flex;
-      gap: 10px;
-      align-items: flex-start;
       justify-content: space-between;
       flex-wrap: wrap;
     }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    .playerTopLeft .title{
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .playerTopLeft .sub{
+      color: var(--muted);
       font-size: 12px;
-      color: rgba(255,255,255,.70);
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items:center;
     }
 
     .miniBtn{
-      padding: 9px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.92);
+      color: rgba(255,255,255,.9);
+      border-radius: 12px;
+      padding: 8px 10px;
       cursor:pointer;
       font-weight: 900;
       font-size: 12px;
     }
-    .miniBtn:active{ transform: translateY(1px); }
-    .miniDanger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.35);
+    .miniBtn:hover{ background: rgba(255,255,255,.10); }
+    .miniPrimary{
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      box-shadow: 0 14px 40px rgba(124,58,237,.12);
+    }
+    .miniDisabled{
+      opacity: .42;
+      pointer-events:none;
     }
 
-    .lessonFields{
+    .playerFrame{
+      position: relative;
+      background: #000;
+      width: 100%;
+      aspect-ratio: 16/9;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .playerFrame iframe{
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .playerEmpty{
+      color: rgba(255,255,255,.78);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 16px;
+      text-align:center;
+      line-height: 1.3;
+    }
+
+    .playerNotes{
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.10);
       display:grid;
-      grid-template-columns: 1fr;
       gap: 10px;
-      padding-right: 12px;
     }
 
-    .lessonFields input{
-      border-radius: 12px;
-      padding: 11px 12px;
+    .notesHeader{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .notesHeader .left{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
     }
 
-    .lesson.dragging{
-      opacity: .65;
-      outline: 2px dashed rgba(124,58,237,.45);
+    .trophy{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      white-space: nowrap;
+    }
+    .trophy small{ color: rgba(255,255,255,.62); font-weight: 800; }
+
+    .playerList{
+      padding: 12px;
+      display:grid;
+      gap: 10px;
     }
 
-    .empty{
-      margin-top: 10px;
-      border: 1px dashed rgba(255,255,255,.22);
-      border-radius: var(--r);
-      padding: 14px;
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.64);
-      line-height: 1.4;
+    .lessonPick{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 16px;
+      padding: 10px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .lessonPick:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.16);
+    }
+    .lessonPick.active{
+      background: rgba(124,58,237,.12);
+      border-color: rgba(124,58,237,.45);
     }
 
-    /* Player */
-    .playerCard{
-      border: 1px solid var(--border);
-      border-radius: var(--r);
+    .lessonPickTitle{
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .lessonPickMeta{
+      display:flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      align-items:center;
+    }
+
+    .miniLine{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      font-weight: 900;
+    }
+    .miniLine input{ width: 16px; height: 16px; }
+
+    /* Builder + Modules */
+    .builderBar{
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--r-xl);
       background: rgba(0,0,0,.14);
       padding: 12px;
-      margin-bottom: 12px;
+      display:grid;
+      gap: 10px;
     }
-    .playerTop{
+    .barRow{
+      display:flex;
+      gap: 10px;
+      align-items:flex-end;
+      flex-wrap: wrap;
+    }
+
+    .modulesHeader{
+      margin-top: 14px;
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
     }
-    .playerTopLeft{
-      display:flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 220px;
-      flex: 1;
-    }
-    .playerTopLeft .title{
-      font-weight: 950;
+    .modulesHeader h3{
+      margin: 0;
       font-size: 14px;
       letter-spacing: -0.01em;
     }
-    .playerTopLeft .sub{
-      color: rgba(255,255,255,.68);
-      font-size: 12px;
+
+    .module{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--r-xl);
+      background: rgba(0,0,0,.12);
+      overflow:hidden;
     }
-    .playerFrame{
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
+    .moduleTop{
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
       display:flex;
+      gap: 10px;
       align-items:center;
-      justify-content:center;
-      color: rgba(255,255,255,.65);
-      font-size: 13px;
-      padding: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
-    .playerFrame iframe{
-      width:100%;
-      height:100%;
-      border:0;
-      display:block;
-      background:#000;
+    .moduleTopLeft{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      min-width: 0;
+      flex: 1;
+    }
+    .moduleTitle{
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+      min-width: 0;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    /* confirm modal */
+    .moduleBody{
+      padding: 12px;
+      display:grid;
+      gap: 10px;
+    }
+
+    .lessonRow{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+      border-radius: 16px;
+      padding: 10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .lessonRowLeft{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      min-width:0;
+    }
+    .lessonRowTitle{
+      min-width:0;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .lessonRowSub{
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .lessonActions{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap: wrap;
+    }
+
+    .iconBtn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.9);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+      line-height: 1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+    }
+    .iconBtn:hover{ background: rgba(255,255,255,.10); }
+    .iconBtn.danger{
+      border-color: rgba(239,68,68,.35);
+      background: rgba(239,68,68,.14);
+    }
+
+    .empty{
+      border: 1px dashed rgba(255,255,255,.20);
+      border-radius: var(--r-xl);
+      padding: 16px;
+      text-align:center;
+      color: rgba(255,255,255,.78);
+      font-weight: 800;
+      background: rgba(0,0,0,.10);
+      margin-top: 12px;
+    }
+
+    /* Modal */
     .modalBack{
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.62);
       display:none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 100;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 50;
     }
     .modalBack.open{ display:flex; }
     .modal{
       width: min(520px, 100%);
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.16);
       background: rgba(10,12,22,.96);
-      box-shadow: 0 24px 90px rgba(0,0,0,.6);
-      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 30px 90px rgba(0,0,0,.65);
+      overflow:hidden;
     }
     .modalHeader{
       padding: 14px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
+      border-bottom: 1px solid rgba(255,255,255,.10);
     }
     .modalHeader h4{
       margin:0;
       font-size: 14px;
-      font-weight: 950;
       letter-spacing: -0.01em;
     }
     .modalBody{
-      padding: 12px 14px;
-      color: rgba(255,255,255,.75);
+      padding: 14px;
+      color: rgba(255,255,255,.86);
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.35;
     }
     .modalActions{
       padding: 12px 14px 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
       display:flex;
       gap: 10px;
-      justify-content: flex-end;
+      justify-content:flex-end;
       flex-wrap: wrap;
     }
 
-    @media (min-width: 980px){
-      .builderBar{
-        grid-template-columns: 1.2fr .8fr;
-        align-items: end;
-      }
-      .lessonFields{ grid-template-columns: 1fr 1fr; }
+    .link{
+      color: rgba(180,200,255,.96);
+      text-decoration:none;
+      font-weight: 900;
+    }
+    .link:hover{ text-decoration: underline; }
+
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
     }
 
     @media (max-width: 980px){
       .shell{ grid-template-columns: 1fr; }
       .sidebar{ border-right: 0; border-bottom: 1px solid var(--border); }
-    }
-
-    @media (max-width: 520px){
-      .lesson{ grid-template-columns: 1fr; }
-      .lessonBody{ padding: 12px; }
-      .lessonFields{ padding-right: 0; }
-      .mainHeaderLeft{ min-width: 0; }
     }
   </style>
 </head>
@@ -714,11 +761,12 @@
       <div class="mainHeader">
         <div class="mainHeaderLeft">
           <h2 id="mainTitle">My Course</h2>
-          <p>Build modules & lessons from YouTube links. Click a thumbnail to watch. Use Prev/Next.</p>
+          <p>Build modules & lessons from YouTube links. Track completion. Click a lesson to watch.</p>
         </div>
         <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content:flex-end;">
           <div class="pill" id="statsPill">0 modules • 0 lessons</div>
-          <button class="btn btnGhost" id="startWatchingBtn">Start watching</button>
+          <div class="pill" id="progressPill">0% complete</div>
+          <button class="btn btnGhost" id="startWatchingBtn">Start / Resume</button>
           <button class="btn btnGhost" id="exportCourseBtn">Export course</button>
           <button class="btn btnDanger" id="deleteCourseBtn">Delete course</button>
         </div>
@@ -726,24 +774,54 @@
 
       <div class="content">
         <!-- Player -->
-        <div class="playerCard" id="playerCard">
+        <div class="player" id="player">
           <div class="playerTop">
             <div class="playerTopLeft">
               <div class="title">Player</div>
-              <div class="sub" id="playerSub">Pick a lesson to start watching.</div>
+              <div class="sub" id="playerSub">
+                Pick a lesson to start watching.
+              </div>
             </div>
-            <div style="display:flex; gap:8px; flex-wrap: wrap;">
-              <button class="miniBtn" id="prevBtn">Prev</button>
-              <button class="btn" id="nextBtn">Next</button>
+            <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content:flex-end;">
+              <button class="miniBtn btnGhost" id="prevBtn">Prev</button>
+              <button class="miniBtn miniPrimary" id="nextBtn">Next</button>
             </div>
           </div>
 
           <div class="playerFrame" id="playerFrame">
-            Add a lesson with a valid YouTube link, then click its thumbnail to watch here.
+            <div class="playerEmpty" id="playerEmpty">
+              Add a lesson with a valid YouTube link, then click it below to watch here.
+            </div>
           </div>
+
+          <div class="playerNotes" id="playerNotes" style="display:none;">
+            <div class="notesHeader">
+              <div class="left">
+                <div class="trophy" title="Bronze trophy is earned the first time you play this lesson.">
+                  🥉 <strong>Bronze</strong> <small id="bronzeText">Not earned</small>
+                </div>
+                <div class="trophy" title="Silver trophy is earned when you click “I understand this”.">
+                  🥈 <strong>Silver</strong> <small id="silverText">Not earned</small>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="miniBtn miniPrimary" id="understandBtn">I understand this</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Notes for this lesson</label>
+              <textarea id="notesBox" placeholder="Write your notes here…"></textarea>
+              <div class="muted" id="notesMeta" style="margin-top:8px;">Notes are saved automatically.</div>
+            </div>
+          </div>
+
+          <div class="playerList" id="playerList"></div>
         </div>
 
-        <div class="builderBar">
+        <!-- Builder -->
+        <div class="builderBar" style="margin-top:12px;">
           <div class="field">
             <label>Course title</label>
             <input id="courseTitle" placeholder="e.g. Intro to Data Analysis (YouTube)" />
@@ -763,7 +841,7 @@
             </div>
 
             <div class="muted" style="margin-top:8px;">
-              Course covers use the first lesson thumbnail (no API needed).
+              Tracking is stored in this browser (localStorage).
             </div>
           </div>
         </div>
@@ -795,7 +873,7 @@
   </div>
 
 <script>
-  const LIB_KEY = "yt_course_library_v2";
+  const LIB_KEY = "study_mate_library_v1";
 
   const els = {
     // sidebar
@@ -806,24 +884,33 @@
     exportLibraryBtn: document.getElementById("exportLibraryBtn"),
     importLibraryBtn: document.getElementById("importLibraryBtn"),
 
-    // main
+    // header
     mainTitle: document.getElementById("mainTitle"),
     statsPill: document.getElementById("statsPill"),
+    progressPill: document.getElementById("progressPill"),
     startWatchingBtn: document.getElementById("startWatchingBtn"),
     exportCourseBtn: document.getElementById("exportCourseBtn"),
     deleteCourseBtn: document.getElementById("deleteCourseBtn"),
 
+    // player
     playerSub: document.getElementById("playerSub"),
-    playerFrame: document.getElementById("playerFrame"),
     prevBtn: document.getElementById("prevBtn"),
     nextBtn: document.getElementById("nextBtn"),
+    playerFrame: document.getElementById("playerFrame"),
+    playerList: document.getElementById("playerList"),
+    playerNotes: document.getElementById("playerNotes"),
+    notesBox: document.getElementById("notesBox"),
+    notesMeta: document.getElementById("notesMeta"),
+    understandBtn: document.getElementById("understandBtn"),
+    bronzeText: document.getElementById("bronzeText"),
+    silverText: document.getElementById("silverText"),
 
+    // builder
     courseTitle: document.getElementById("courseTitle"),
     urls: document.getElementById("urls"),
     moduleSelect: document.getElementById("moduleSelect"),
     addBtn: document.getElementById("addBtn"),
     addModuleBtn: document.getElementById("addModuleBtn"),
-
     modules: document.getElementById("modules"),
     empty: document.getElementById("empty"),
 
@@ -835,74 +922,14 @@
     modalConfirm: document.getElementById("modalConfirm"),
   };
 
-  // ---------- modal ----------
-  let modalAction = null;
-  function openModal({ title, body, confirmText="Confirm", onConfirm }){
-    els.modalTitle.textContent = title;
-    els.modalBody.textContent = body;
-    els.modalConfirm.textContent = confirmText;
-    modalAction = onConfirm;
-    els.modalBack.classList.add("open");
-  }
-  function closeModal(){
-    els.modalBack.classList.remove("open");
-    modalAction = null;
-  }
-  els.modalCancel.addEventListener("click", closeModal);
-  els.modalBack.addEventListener("click", (e) => { if (e.target === els.modalBack) closeModal(); });
-  els.modalConfirm.addEventListener("click", () => {
-    if (typeof modalAction === "function") modalAction();
-    closeModal();
-  });
+  // ---------- state ----------
+  let lib = loadLib();
+  let playingLessonId = "";
+  let notesTimer = null;
 
-  document.addEventListener("click", () => closeAllMenus());
-
-  // ---------- utils ----------
+  // ---------- utilities ----------
   function uid(){
-    return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-  }
-
-  function makeCourse(title){
-    return {
-      id: uid(),
-      title: title || "Untitled course",
-      modules: [{ id: uid(), title: "Module 1", lessons: [] }],
-      watchIndex: 0
-    };
-  }
-
-  function seedLib(){
-    const first = makeCourse("My Course");
-    return { activeId: first.id, courses: [first] };
-  }
-
-  function saveLib(){
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    render();
-  }
-
-  function loadLib(){
-    try{
-      const raw = localStorage.getItem(LIB_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.courses)) return null;
-      return parsed;
-    }catch{
-      return null;
-    }
-  }
-
-  function migrateFromV1IfNeeded(){
-    try{
-      const v1 = localStorage.getItem("yt_course_library_v1");
-      if (!v1) return;
-      const parsed = JSON.parse(v1);
-      if (parsed && Array.isArray(parsed.courses) && !localStorage.getItem(LIB_KEY)) {
-        lib = parsed;
-        localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-      }
-    }catch{}
+    return Math.random().toString(36).slice(2,10) + Date.now().toString(36);
   }
 
   function extractVideoId(url){
@@ -911,132 +938,179 @@
       if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
       if (u.searchParams.get("v")) return u.searchParams.get("v");
       if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2];
-      return null;
-    }catch{
-      return null;
-    }
-  }
-
-  function ytThumb(videoId){
-    return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+      return "";
+    }catch{ return ""; }
   }
 
   function ytEmbed(videoId){
-    // Use nocookie + referrerpolicy (helps avoid Error 153 on some setups)
-    return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+  }
+  function ytWatch(videoId){
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
   }
 
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[s]));
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
-  function escapeAttr(str){
-    return escapeHtml(str).replace(/"/g, "&quot;");
+  function escapeAttr(s){
+    return escapeHtml(s).replaceAll("`","&#096;");
   }
 
-  function getCourseCoverVideoId(course){
-    for (const m of (course.modules || [])) {
-      for (const l of (m.lessons || [])) {
-        if (l && l.videoId) return l.videoId;
-      }
+  function loadLib(){
+    try{
+      const raw = localStorage.getItem(LIB_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return normalizeLib(parsed);
+    }catch{
+      return normalizeLib(null);
     }
-    return null;
   }
 
-  // ✅ normalize everything (prevents crashes when old/bad data is loaded)
-  function normalizeLib(input){
-    const out = (input && typeof input === "object") ? input : { activeId: "", courses: [] };
-    out.courses = Array.isArray(out.courses) ? out.courses : [];
+  function normalizeLib(raw){
+    const base = { activeId: "", courses: [] };
+    if (!raw || !Array.isArray(raw.courses)) return seedLib(base);
 
-    out.courses = out.courses.map(c => {
-      const course = (c && typeof c === "object") ? c : {};
-      const title = typeof course.title === "string" ? course.title : "Untitled course";
-      const watchIndex = Number.isFinite(course.watchIndex) ? course.watchIndex : 0;
-
-      let modules = Array.isArray(course.modules) ? course.modules : [];
-      modules = modules.map(m => {
-        const mod = (m && typeof m === "object") ? m : {};
-        const mTitle = typeof mod.title === "string" ? mod.title : "Module";
-
-        let lessons = Array.isArray(mod.lessons) ? mod.lessons : [];
-        lessons = lessons.map(l => {
-          const les = (l && typeof l === "object") ? l : {};
-          const url = typeof les.url === "string" ? les.url : "";
-          return {
-            id: typeof les.id === "string" ? les.id : uid(),
-            title: typeof les.title === "string" ? les.title : "Lesson",
-            url,
-            videoId: typeof les.videoId === "string"
-              ? les.videoId
-              : (url ? (extractVideoId(url) || "") : "")
-          };
-        });
+    const courses = raw.courses
+      .filter(c => c && typeof c.title === "string" && Array.isArray(c.modules))
+      .map(c => {
+        const modules = (c.modules || [])
+          .filter(m => m && typeof m.title === "string" && Array.isArray(m.lessons))
+          .map(m => {
+            const lessons = (m.lessons || [])
+              .filter(les => les && (typeof les.url === "string" || typeof les.videoId === "string"))
+              .map(les => {
+                const url = typeof les.url === "string" ? les.url : "";
+                const vid = typeof les.videoId === "string" ? les.videoId : extractVideoId(url);
+                return {
+                  id: typeof les.id === "string" ? les.id : uid(),
+                  title: typeof les.title === "string" ? les.title : "Lesson",
+                  url,
+                  videoId: vid || "",
+                  completed: !!les.completed,
+                  watched: !!les.watched,
+                  understood: !!les.understood,
+                  notes: typeof les.notes === "string" ? les.notes : ""
+                };
+              });
+            return {
+              id: typeof m.id === "string" ? m.id : uid(),
+              title: m.title,
+              lessons
+            };
+          });
 
         return {
-          id: typeof mod.id === "string" ? mod.id : uid(),
-          title: mTitle,
-          lessons
+          id: typeof c.id === "string" ? c.id : uid(),
+          title: c.title,
+          lastLessonId: typeof c.lastLessonId === "string" ? c.lastLessonId : "",
+          modules: modules.length ? modules : [{ id: uid(), title:"Module 1", lessons: [] }]
         };
       });
 
-      if (!modules.length) modules = [{ id: uid(), title: "Module 1", lessons: [] }];
+    const activeId = (typeof raw.activeId === "string" && courses.some(c => c.id === raw.activeId))
+      ? raw.activeId
+      : (courses[0]?.id || "");
 
-      return {
-        id: typeof course.id === "string" ? course.id : uid(),
-        title,
-        modules,
-        watchIndex
-      };
-    });
-
-    if (!out.courses.length) {
-      const first = makeCourse("My Course");
-      out.courses = [first];
-      out.activeId = first.id;
-    }
-
-    if (!out.courses.some(c => c.id === out.activeId)) {
-      out.activeId = out.courses[0].id;
-    }
-
-    // clamp watchIndex
-    for (const c of out.courses){
-      const flat = flattenLessons(c);
-      if (!flat.length) c.watchIndex = 0;
-      else c.watchIndex = Math.max(0, Math.min(c.watchIndex || 0, flat.length - 1));
-    }
-
-    return out;
+    return { activeId, courses };
   }
 
+  function seedLib(base){
+    const first = makeCourse("Index.html");
+    base.courses = [first, makeCourse("Cooking 101"), makeCourse("Parenting 101"), makeCourse("Landscaping 101")];
+    base.activeId = base.courses[0].id;
+    return base;
+  }
+
+  function makeCourse(title){
+    return {
+      id: uid(),
+      title: title || "Untitled course",
+      lastLessonId: "",
+      modules: [{ id: uid(), title: "Module 1", lessons: [] }]
+    };
+  }
+
+  function saveLib(){
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    render();
+  }
+
+  // ---------- derived helpers ----------
   function activeCourse(){
-    return lib.courses.find(c => c.id === lib.activeId);
+    return (lib.courses || []).find(c => c.id === lib.activeId) || lib.courses[0] || makeCourse("My Course");
   }
 
   function flattenLessons(course){
     const out = [];
-    for (const m of (course.modules || [])){
-      for (const l of (m.lessons || [])){
-        // only count lessons that have a usable videoId
-        if (l && l.videoId){
-          out.push({ moduleId: m.id, lessonId: l.id, videoId: l.videoId, title: l.title || "Lesson", url: l.url || "" });
-        }
-      }
-    }
+    (course?.modules || []).forEach(m => {
+      (m.lessons || []).forEach(l => {
+        out.push({
+          moduleId: m.id,
+          moduleTitle: m.title,
+          lessonId: l.id,
+          lesson: l
+        });
+      });
+    });
     return out;
   }
 
+  function courseStats(course){
+    const flat = flattenLessons(course);
+    const total = flat.length;
+    const done = flat.filter(x => x.lesson.completed).length;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    return { total, done, pct };
+  }
+
+  // ---------- modal ----------
+  let modalResolve = null;
+  function confirmModal(title, body, confirmText="Confirm"){
+    els.modalTitle.textContent = title;
+    els.modalBody.textContent = body;
+    els.modalConfirm.textContent = confirmText;
+    els.modalBack.classList.add("open");
+    return new Promise(res => modalResolve = res);
+  }
+  function closeModal(value){
+    els.modalBack.classList.remove("open");
+    const r = modalResolve;
+    modalResolve = null;
+    if (r) r(value);
+  }
+
+  els.modalCancel.addEventListener("click", () => closeModal(false));
+  els.modalBack.addEventListener("click", (e) => {
+    if (e.target === els.modalBack) closeModal(false);
+  });
+
+  els.modalConfirm.addEventListener("click", () => closeModal(true));
+
   // ---------- library actions ----------
   function newCourse(){
-    const c = makeCourse(`Course ${lib.courses.length + 1}`);
+    const c = makeCourse("New course");
     lib.courses = [c, ...lib.courses];
     lib.activeId = c.id;
+    playingLessonId = "";
     saveLib();
   }
 
-  function switchCourse(id){
-    lib.activeId = id;
+  function switchCourse(courseId){
+    lib.activeId = courseId;
+    playingLessonId = "";
+    saveLib();
+  }
+
+  function renameCourse(courseId){
+    const c = lib.courses.find(x => x.id === courseId);
+    const title = prompt("Rename course", c?.title || "");
+    if (title == null) return;
+    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: title.trim() || "Untitled course" } : x);
     saveLib();
   }
 
@@ -1047,6 +1121,7 @@
     const copy = {
       id: uid(),
       title: (src.title || "Untitled") + " (Copy)",
+      lastLessonId: "",
       modules: (src.modules || []).map(m => ({
         id: uid(),
         title: m.title || "Module",
@@ -1054,47 +1129,45 @@
           id: uid(),
           videoId: l.videoId || "",
           url: l.url || "",
-          title: l.title || "Lesson"
+          title: l.title || "Lesson",
+          completed: !!l.completed,
+          watched: !!l.watched,
+          understood: !!l.understood,
+          notes: typeof l.notes === "string" ? l.notes : ""
         }))
-      })),
-      watchIndex: 0
+      }))
     };
 
     lib.courses = [copy, ...lib.courses];
     lib.activeId = copy.id;
+    playingLessonId = "";
     saveLib();
   }
 
-  function renameCourse(courseId){
+  async function deleteCourse(courseId){
     const c = lib.courses.find(x => x.id === courseId);
     if (!c) return;
-    const next = prompt("Rename course:", c.title || "Untitled course");
-    if (!next) return;
-    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: next } : x);
+
+    const ok = await confirmModal("Delete course?", `Delete "${c.title}" permanently?`, "Delete");
+    if (!ok) return;
+
+    lib.courses = lib.courses.filter(x => x.id !== courseId);
+    if (!lib.courses.length){
+      const n = makeCourse("My Course");
+      lib.courses = [n];
+      lib.activeId = n.id;
+    }else if (lib.activeId === courseId){
+      lib.activeId = lib.courses[0].id;
+    }
+    playingLessonId = "";
     saveLib();
-  }
-
-  function deleteCourse(courseId){
-    const c = lib.courses.find(x => x.id === courseId);
-    if (!c) return;
-
-    openModal({
-      title: "Delete course",
-      body: `This will permanently delete "${c.title || "Untitled course"}" from this browser.`,
-      confirmText: "Delete",
-      onConfirm: () => {
-        lib.courses = lib.courses.filter(x => x.id !== courseId);
-        lib = normalizeLib(lib);
-        saveLib();
-      }
-    });
   }
 
   function exportLibrary(){
-    const blob = new Blob([JSON.stringify({ version: 2, ...lib }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(lib, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "course-library.json";
+    a.download = "study_mate_library.json";
     a.click();
     URL.revokeObjectURL(a.href);
   }
@@ -1104,13 +1177,48 @@
     input.type = "file";
     input.accept = "application/json";
     input.addEventListener("change", async () => {
-      const file = input.files?.[0];
+      const file = input.files && input.files[0];
       if (!file) return;
       try{
         const text = await file.text();
         const parsed = JSON.parse(text);
         if (!parsed || !Array.isArray(parsed.courses)) return;
-        lib = normalizeLib(parsed);
+
+        // Import supports older exports too (missing watched/understood/notes).
+        const cleaned = {
+          activeId: "",
+          courses: parsed.courses
+            .filter(c => c && typeof c.title === "string" && Array.isArray(c.modules))
+            .map(c => ({
+              id: uid(),
+              title: c.title,
+              lastLessonId: "",
+              modules: c.modules
+                .filter(m => m && typeof m.title === "string" && Array.isArray(m.lessons))
+                .map(m => ({
+                  id: uid(),
+                  title: m.title,
+                  lessons: m.lessons
+                    .filter(l => l && typeof l.url === "string")
+                    .map(l => ({
+                      id: uid(),
+                      url: l.url,
+                      videoId: typeof l.videoId === "string" ? l.videoId : (extractVideoId(l.url) || ""),
+                      title: typeof l.title === "string" ? l.title : "Lesson",
+                      completed: !!l.completed,
+                      watched: !!l.watched,
+                      understood: !!l.understood,
+                      notes: typeof l.notes === "string" ? l.notes : ""
+                    }))
+                }))
+            }))
+        };
+
+        if (!cleaned.courses.length) return;
+        cleaned.activeId = cleaned.courses[0].id;
+
+        lib = normalizeLib(cleaned);
+        playingLessonId = "";
         saveLib();
       }catch{}
     });
@@ -1128,8 +1236,8 @@
   function addModule(){
     lib.courses = lib.courses.map(c => {
       if (c.id !== lib.activeId) return c;
-      const next = { ...c, modules: [...c.modules, { id: uid(), title: `Module ${c.modules.length + 1}`, lessons: [] }] };
-      return next;
+      const mods = Array.isArray(c.modules) ? c.modules : [];
+      return { ...c, modules: [...mods, { id: uid(), title: `Module ${mods.length + 1}`, lessons: [] }] };
     });
     saveLib();
   }
@@ -1152,8 +1260,8 @@
       const j = i + dir;
       if (i < 0 || j < 0 || j >= mods.length) return c;
       const next = [...mods];
-      const [m] = next.splice(i, 1);
-      next.splice(j, 0, m);
+      const item = next.splice(i, 1)[0];
+      next.splice(j, 0, item);
       return { ...c, modules: next };
     });
     saveLib();
@@ -1165,6 +1273,8 @@
       return { ...c, modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, title } : m) };
     });
     localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    renderPlayerOnly();
+    renderSidebarOnly();
   }
 
   function updateLesson(moduleId, lessonId, patch){
@@ -1179,18 +1289,24 @@
       };
     });
     localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    renderHeaderOnly();
+    renderPlayerOnly();
+    renderSidebarOnly();
   }
 
   function removeLesson(moduleId, lessonId){
     lib.courses = lib.courses.map(c => {
       if (c.id !== lib.activeId) return c;
-      return {
+      const next = {
         ...c,
-        modules: (c.modules || []).map(m => m.id === moduleId
-          ? { ...m, lessons: (m.lessons || []).filter(l => l.id !== lessonId) }
-          : m)
+        modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, lessons: (m.lessons || []).filter(l => l.id !== lessonId) } : m)
       };
+
+      if (next.lastLessonId === lessonId) next.lastLessonId = "";
+      return next;
     });
+
+    if (playingLessonId === lessonId) playingLessonId = "";
     saveLib();
   }
 
@@ -1205,30 +1321,8 @@
           const j = lessonIndex + dir;
           if (j < 0 || j >= lessons.length) return m;
           const next = [...lessons];
-          const [it] = next.splice(lessonIndex, 1);
-          next.splice(j, 0, it);
-          return { ...m, lessons: next };
-        })
-      };
-    });
-    saveLib();
-  }
-
-  function reorderLessonById(moduleId, fromLessonId, toLessonId){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      return {
-        ...c,
-        modules: (c.modules || []).map(m => {
-          if (m.id !== moduleId) return m;
-          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
-          const fromIndex = lessons.findIndex(l => l.id === fromLessonId);
-          const toIndex = lessons.findIndex(l => l.id === toLessonId);
-          if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return m;
-
-          const next = [...lessons];
-          const [moved] = next.splice(fromIndex, 1);
-          next.splice(toIndex, 0, moved);
+          const item = next.splice(lessonIndex, 1)[0];
+          next.splice(j, 0, item);
           return { ...m, lessons: next };
         })
       };
@@ -1241,7 +1335,7 @@
     if (!lines.length) return;
 
     const c = activeCourse();
-    const module = (c?.modules || []).find(m => m.id === moduleId);
+    const module = (c.modules || []).find(m => m.id === moduleId);
     if (!module) return;
 
     const existingVideoIds = new Set((module.lessons || []).map(l => l.videoId));
@@ -1251,8 +1345,7 @@
       const vid = extractVideoId(line);
       if (!vid) continue;
       if (existingVideoIds.has(vid)) continue;
-
-      toAdd.push({ id: uid(), videoId: vid, url: line.trim(), title: "New lesson" });
+      toAdd.push({ id: uid(), videoId: vid, url: line.trim(), title: "New lesson", completed: false, watched: false, understood: false, notes: "" });
       existingVideoIds.add(vid);
     }
     if (!toAdd.length) return;
@@ -1261,9 +1354,7 @@
       if (course.id !== lib.activeId) return course;
       return {
         ...course,
-        modules: (course.modules || []).map(m => m.id === moduleId
-          ? { ...m, lessons: [...(m.lessons || []), ...toAdd] }
-          : m)
+        modules: (course.modules || []).map(m => m.id === moduleId ? { ...m, lessons: [...(m.lessons || []), ...toAdd] } : m)
       };
     });
 
@@ -1271,7 +1362,51 @@
     saveLib();
   }
 
-  // ---------- sidebar menus ----------
+  // ---------- player ----------
+  function setPlaying(lessonId){
+    const c = activeCourse();
+    const flat = flattenLessons(c);
+    const found = flat.find(x => x.lessonId === lessonId);
+    if (!found || !found.lesson.videoId) return;
+
+    playingLessonId = lessonId;
+
+    // Bronze trophy: earn on first play
+    if (!found.lesson.watched){
+      updateLesson(found.moduleId, found.lessonId, { watched: true });
+    }
+
+    lib.courses = lib.courses.map(course => {
+      if (course.id !== lib.activeId) return course;
+      return { ...course, lastLessonId: lessonId };
+    });
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    renderPlayerOnly();
+    renderSidebarOnly();
+  }
+
+  function resume(){
+    const c = activeCourse();
+    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
+    if (!flat.length) return;
+
+    const target = (c.lastLessonId && flat.find(x => x.lessonId === c.lastLessonId)) || flat[0];
+    setPlaying(target.lessonId);
+  }
+
+  function playerPrevNext(dir){
+    const c = activeCourse();
+    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
+    if (!flat.length) return;
+
+    const idx = flat.findIndex(x => x.lessonId === playingLessonId);
+    const nextIdx = idx < 0 ? 0 : (idx + dir);
+    if (nextIdx < 0 || nextIdx >= flat.length) return;
+
+    setPlaying(flat[nextIdx].lessonId);
+  }
+
+  // ---------- menus ----------
   function closeAllMenus(){
     document.querySelectorAll(".menu.open").forEach(m => m.classList.remove("open"));
   }
@@ -1282,126 +1417,80 @@
     if (!isOpen) menuEl.classList.add("open");
   }
 
-  // ---------- Player logic ----------
-  function setWatchIndex(nextIndex){
-    const c = activeCourse();
-    if (!c) return;
-    const flat = flattenLessons(c);
-    if (!flat.length){
-      c.watchIndex = 0;
-    } else {
-      c.watchIndex = Math.max(0, Math.min(nextIndex, flat.length - 1));
-    }
-    // persist
-    lib.courses = lib.courses.map(x => x.id === c.id ? { ...x, watchIndex: c.watchIndex } : x);
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    renderPlayer();
-  }
-
-  function startWatching(){
-    const c = activeCourse();
-    if (!c) return;
-    const flat = flattenLessons(c);
-    if (!flat.length){
-      renderPlayer();
-      return;
-    }
-    setWatchIndex(0);
-  }
-
-  function renderPlayer(){
-    const c = activeCourse();
-    if (!c){
-      els.playerSub.textContent = "Pick a course to start watching.";
-      els.playerFrame.textContent = "No course selected.";
-      return;
-    }
-
-    const flat = flattenLessons(c);
-    if (!flat.length){
-      els.playerSub.textContent = "Pick a lesson to start watching.";
-      els.playerFrame.textContent = "Add a lesson with a valid YouTube link, then click its thumbnail to watch here.";
-      return;
-    }
-
-    const idx = Number.isFinite(c.watchIndex) ? c.watchIndex : 0;
-    const safeIdx = Math.max(0, Math.min(idx, flat.length - 1));
-    const item = flat[safeIdx];
-
-    els.playerSub.textContent = `${safeIdx + 1} of ${flat.length} — ${item.title || "Lesson"}`;
-
-    const src = ytEmbed(item.videoId);
-
-    els.playerFrame.innerHTML = `
-      <iframe
-        src="${escapeAttr(src)}"
-        title="${escapeAttr(item.title || "YouTube lesson")}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
-    `;
-  }
-
   // ---------- rendering ----------
   function renderHeaderOnly(){
     const c = activeCourse();
-    els.mainTitle.textContent = c?.title || "My Course";
-    els.courseTitle.value = c?.title || "";
+    els.mainTitle.textContent = c && c.title ? c.title : "My Course";
+    els.courseTitle.value = c && c.title ? c.title : "";
+
+    const modCount = (c.modules || []).length;
+    const lessonCount = flattenLessons(c).length;
+    els.statsPill.textContent = `${modCount} module${modCount===1?"":"s"} • ${lessonCount} lesson${lessonCount===1?"":"s"}`;
+
+    const { pct } = courseStats(c);
+    els.progressPill.textContent = `${pct}% complete`;
+
+    // module select
+    els.moduleSelect.innerHTML = "";
+    (c.modules || []).forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = m.title || "Module";
+      els.moduleSelect.appendChild(opt);
+    });
+
+    // empty state
+    els.empty.style.display = flattenLessons(c).length ? "none" : "block";
   }
 
   function renderSidebarOnly(){
     const q = (els.courseSearch.value || "").toLowerCase();
-    const courses = lib.courses.filter(c => (c.title || "").toLowerCase().includes(q));
+    const courses = (lib.courses || []).filter(c => (c.title || "").toLowerCase().includes(q));
 
     els.courseList.innerHTML = "";
     els.libraryMeta.textContent = `${lib.courses.length} course${lib.courses.length===1?"":"s"}`;
 
     courses.forEach(c => {
       const modCount = (c.modules || []).length;
-      const lessonCount = (c.modules || []).reduce((a,m)=>a+((m.lessons||[]).length),0);
-      const coverVid = getCourseCoverVideoId(c);
+      const lessonCount = flattenLessons(c).length;
+      const { total, done, pct } = courseStats(c);
 
-      const card = document.createElement("div");
-      card.className = "courseCard" + (c.id === lib.activeId ? " active" : "");
+      const row = document.createElement("div");
+      row.className = "courseRow" + (c.id === lib.activeId ? " active" : "");
 
-      card.innerHTML = `
-        <div class="cover">
-          ${coverVid ? `<img src="${escapeAttr(ytThumb(coverVid))}" alt="Course cover" />` : ""}
-          <div class="fade"></div>
-          <div class="badge">${lessonCount} lesson${lessonCount===1?"":"s"}</div>
+      row.innerHTML = `
+        <div class="courseLeft">
+          <div class="courseName">${escapeHtml(c.title || "Untitled course")}</div>
+
+          <div class="courseMeta">
+            <span class="chip">${modCount} module${modCount===1?"":"s"}</span>
+            <span class="chip">${lessonCount} lesson${lessonCount===1?"":"s"}</span>
+          </div>
+
+          <div class="progressWrap" title="${done}/${total} lessons complete">
+            <div class="bar"><div style="width:${pct}%;"></div></div>
+            <div>${pct}%</div>
+          </div>
         </div>
 
-        <div class="courseBody">
-          <div class="courseTitleRow">
-            <div style="min-width:0;">
-              <div class="courseTitle">${escapeHtml(c.title || "Untitled course")}</div>
-              <div class="courseMeta">
-                <span class="chip">${modCount} module${modCount===1?"":"s"}</span>
-                <span class="chip">${lessonCount} lesson${lessonCount===1?"":"s"}</span>
-              </div>
-            </div>
-
-            <div class="menuWrap">
-              <button class="kebab" data-act="menuBtn" title="Course actions">⋯</button>
-              <div class="menu" data-act="menu">
-                <button data-act="rename">Rename</button>
-                <button data-act="duplicate">Duplicate</button>
-                <button class="danger" data-act="delete">Delete</button>
-              </div>
-            </div>
+        <div class="menuWrap">
+          <button class="kebab" data-act="menuBtn" title="Course actions">⋯</button>
+          <div class="menu" data-act="menu">
+            <button data-act="rename">Rename</button>
+            <button data-act="duplicate">Duplicate</button>
+            <button class="danger" data-act="delete">Delete</button>
           </div>
         </div>
       `;
 
-      card.addEventListener("click", (e) => {
+      row.addEventListener("click", (e) => {
         const clickedMenu = e.target.closest('[data-act="menuBtn"]') || e.target.closest('[data-act="menu"]');
         if (clickedMenu) return;
         switchCourse(c.id);
       });
 
-      const menuBtn = card.querySelector('[data-act="menuBtn"]');
-      const menu = card.querySelector('[data-act="menu"]');
+      const menuBtn = row.querySelector('[data-act="menuBtn"]');
+      const menu = row.querySelector('[data-act="menu"]');
 
       menuBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1409,225 +1498,330 @@
       });
       menu.addEventListener("click", (e) => e.stopPropagation());
 
-      card.querySelector('[data-act="rename"]').addEventListener("click", () => {
+      row.querySelector('[data-act="rename"]').addEventListener("click", () => {
         closeAllMenus();
         renameCourse(c.id);
       });
-      card.querySelector('[data-act="duplicate"]').addEventListener("click", () => {
+      row.querySelector('[data-act="duplicate"]').addEventListener("click", () => {
         closeAllMenus();
         duplicateCourse(c.id);
       });
-      card.querySelector('[data-act="delete"]').addEventListener("click", () => {
+      row.querySelector('[data-act="delete"]').addEventListener("click", () => {
         closeAllMenus();
         deleteCourse(c.id);
       });
 
-      els.courseList.appendChild(card);
+      els.courseList.appendChild(row);
     });
+  }
+
+  function renderPlayerOnly(){
+    const c = activeCourse();
+    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
+
+    els.playerList.innerHTML = "";
+
+    if (!flat.length){
+      els.playerSub.textContent = "Pick a lesson to start watching.";
+      els.prevBtn.classList.add("miniDisabled");
+      els.nextBtn.classList.add("miniDisabled");
+
+      els.playerFrame.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "playerEmpty";
+      empty.textContent = "Add a lesson with a valid YouTube link, then click it below to watch here.";
+      els.playerFrame.appendChild(empty);
+
+      if (els.playerNotes) els.playerNotes.style.display = "none";
+      return;
+    }
+
+    let idx = flat.findIndex(x => x.lessonId === playingLessonId);
+    if (idx < 0) idx = c.lastLessonId ? flat.findIndex(x => x.lessonId === c.lastLessonId) : -1;
+    if (idx < 0) idx = 0;
+
+    const current = flat[idx];
+    const lessonTitle = (current.lesson.title || "Lesson").trim() || "Lesson";
+
+    const doneMark = current.lesson.completed ? "✅ Completed" : "Not completed";
+    const bronze = current.lesson.watched ? "🥉" : "—";
+    const silver = current.lesson.understood ? "🥈" : "—";
+
+    els.playerSub.innerHTML = `
+      <span class="mono">${idx + 1} of ${flat.length}</span>
+      <span>—</span>
+      <span>${escapeHtml(lessonTitle)}</span>
+      <span>•</span>
+      <span>${doneMark}</span>
+      <span>•</span>
+      <span title="Rewards">${bronze} ${silver}</span>
+      <span>•</span>
+      <a class="link" href="${escapeAttr(ytWatch(current.lesson.videoId))}" target="_blank" rel="noreferrer">Open on YouTube</a>
+    `;
+
+    if (idx <= 0) els.prevBtn.classList.add("miniDisabled"); else els.prevBtn.classList.remove("miniDisabled");
+    if (idx >= flat.length - 1) els.nextBtn.classList.add("miniDisabled"); else els.nextBtn.classList.remove("miniDisabled");
+
+    els.playerFrame.innerHTML = `
+      <iframe
+        title="YouTube player"
+        src="${escapeAttr(ytEmbed(current.lesson.videoId))}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen></iframe>
+    `;
+
+    if (els.playerNotes){
+      els.playerNotes.style.display = "grid";
+      if (els.bronzeText) els.bronzeText.textContent = current.lesson.watched ? "Earned" : "Not earned";
+      if (els.silverText) els.silverText.textContent = current.lesson.understood ? "Earned" : "Not earned";
+
+      if (els.understandBtn){
+        if (current.lesson.understood){
+          els.understandBtn.textContent = "Understood ✓";
+          els.understandBtn.classList.add("miniDisabled");
+        } else {
+          els.understandBtn.textContent = "I understand this";
+          els.understandBtn.classList.remove("miniDisabled");
+        }
+
+        els.understandBtn.onclick = () => {
+          if (current.lesson.understood) return;
+          updateLesson(current.moduleId, current.lessonId, { understood: true });
+        };
+      }
+
+      if (els.notesBox){
+        els.notesBox.value = current.lesson.notes || "";
+        els.notesBox.oninput = (e) => {
+          const val = e.target.value;
+          if (els.notesMeta) els.notesMeta.textContent = "Saving…";
+
+          if (notesTimer) clearTimeout(notesTimer);
+          notesTimer = setTimeout(() => {
+            updateLesson(current.moduleId, current.lessonId, { notes: val });
+            if (els.notesMeta) els.notesMeta.textContent = "Notes are saved automatically.";
+          }, 250);
+        };
+      }
+    }
+
+    flat.forEach((x, i) => {
+      const item = document.createElement("div");
+      const active = x.lessonId === current.lessonId;
+      item.className = "lessonPick" + (active ? " active" : "");
+
+      const state = x.lesson.completed ? "✓" : "•";
+      const b = x.lesson.watched ? "🥉" : "";
+      const s = x.lesson.understood ? "🥈" : "";
+      const rewards = (b || s) ? `${b}${b && s ? " " : ""}${s}` : "—";
+
+      const label = `${state} ${i + 1}. ${x.lesson.title || "Lesson"}`;
+
+      item.innerHTML = `
+        <div class="lessonPickLeft" style="min-width:0;">
+          <div class="lessonPickTitle">${escapeHtml(label)}</div>
+          <div class="lessonPickMeta">
+            <span class="chip">${escapeHtml(x.moduleTitle || "Module")}</span>
+            <span class="mono">ID: ${escapeHtml(x.lesson.videoId)}</span>
+            <span class="chip" title="Rewards">${escapeHtml(rewards)}</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <label class="miniLine" title="Mark completed">
+            <input type="checkbox" ${x.lesson.completed ? "checked" : ""} data-act="done" />
+            <span>Done</span>
+          </label>
+          <button class="miniBtn miniPrimary" data-act="play">Play</button>
+        </div>
+      `;
+
+      item.querySelector('[data-act="play"]').addEventListener("click", (e) => {
+        e.stopPropagation();
+        playingLessonId = x.lessonId;
+        setPlaying(x.lessonId);
+      });
+
+      item.querySelector('[data-act="done"]').addEventListener("change", (e) => {
+        e.stopPropagation();
+        updateLesson(x.moduleId, x.lessonId, { completed: !!e.target.checked });
+      });
+
+      item.addEventListener("click", () => setPlaying(x.lessonId));
+      els.playerList.appendChild(item);
+    });
+
+    playingLessonId = current.lessonId;
+    lib.courses = lib.courses.map(course => course.id === lib.activeId ? { ...course, lastLessonId: current.lessonId } : course);
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
   }
 
   function render(){
-    lib = normalizeLib(lib);
-    const c = activeCourse();
-
     renderHeaderOnly();
+    renderSidebarOnly();
+    renderPlayerOnly();
 
-    const totalLessons = (c.modules || []).reduce((acc, m) => acc + ((m.lessons || []).length), 0);
-    els.statsPill.textContent = `${(c.modules || []).length} module${(c.modules || []).length===1?"":"s"} • ${totalLessons} lesson${totalLessons===1?"":"s"}`;
-
-    els.moduleSelect.innerHTML = "";
-    (c.modules || []).forEach((m, idx) => {
-      const opt = document.createElement("option");
-      opt.value = m.id;
-      opt.textContent = `${idx + 1}. ${m.title}`;
-      els.moduleSelect.appendChild(opt);
-    });
-
+    const c = activeCourse();
     els.modules.innerHTML = "";
-    els.empty.style.display = (c.modules || []).length ? "none" : "block";
 
-    (c.modules || []).forEach((m, moduleIndex) => {
-      const mod = document.createElement("section");
-      mod.className = "module";
-      mod.innerHTML = `
+    (c.modules || []).forEach((m, mi) => {
+      const wrap = document.createElement("div");
+      wrap.className = "module";
+
+      wrap.innerHTML = `
         <div class="moduleTop">
-          <div class="moduleTitle">
-            <span class="moduleChip">Module ${moduleIndex + 1}</span>
-            <input value="${escapeAttr(m.title)}" aria-label="Module title" />
+          <div class="moduleTopLeft">
+            <div class="moduleTitle">${escapeHtml(m.title || "Module")}</div>
+            <span class="chip">${(m.lessons||[]).length} lesson${(m.lessons||[]).length===1?"":"s"}</span>
           </div>
-          <div class="moduleActions">
-            <button class="btn btnGhost" data-act="addOne">+ Lesson</button>
-            <button class="btn btnGhost" data-act="up">↑</button>
-            <button class="btn btnGhost" data-act="down">↓</button>
-            <button class="btn btnDanger" data-act="del">Delete</button>
+
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap: wrap; justify-content:flex-end;">
+            <button class="iconBtn" data-act="up">↑</button>
+            <button class="iconBtn" data-act="down">↓</button>
+            <button class="iconBtn" data-act="rename">Rename</button>
+            <button class="iconBtn danger" data-act="delete">Delete</button>
           </div>
         </div>
-        <div class="lessons"></div>
+
+        <div class="moduleBody" data-body="body"></div>
       `;
 
-      mod.querySelector("input").addEventListener("input", (e) => updateModuleTitle(m.id, e.target.value));
-      mod.querySelector('[data-act="addOne"]').addEventListener("click", () => {
-        const newLesson = { id: uid(), videoId: "", url: "", title: "New lesson" };
-        lib.courses = lib.courses.map(course => {
-          if (course.id !== lib.activeId) return course;
-          return {
-            ...course,
-            modules: (course.modules || []).map(mm => mm.id === m.id
-              ? { ...mm, lessons: [...(mm.lessons || []), newLesson] }
-              : mm)
-          };
-        });
-        saveLib();
+      wrap.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
+      wrap.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
+      wrap.querySelector('[data-act="rename"]').addEventListener("click", () => {
+        const title = prompt("Rename module", m.title || "");
+        if (title == null) return;
+        updateModuleTitle(m.id, title.trim() || "Module");
       });
-      mod.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
-      mod.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
-      mod.querySelector('[data-act="del"]').addEventListener("click", () => removeModule(m.id));
+      wrap.querySelector('[data-act="delete"]').addEventListener("click", async () => {
+        const ok = await confirmModal("Delete module?", `Delete "${m.title}" and its lessons?`, "Delete");
+        if (!ok) return;
+        removeModule(m.id);
+      });
 
-      const lessonsEl = mod.querySelector(".lessons");
+      const body = wrap.querySelector('[data-body="body"]');
 
-      if (!(m.lessons || []).length) {
+      if (!(m.lessons || []).length){
         const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "No lessons yet. Paste YouTube links above and click “Add lessons”, or click “+ Lesson”.";
-        lessonsEl.appendChild(empty);
-      } else {
+        empty.className = "muted";
+        empty.textContent = "No lessons yet. Paste YouTube links above to add lessons to this module.";
+        body.appendChild(empty);
+      }else{
         (m.lessons || []).forEach((l, li) => {
-          const hasVid = !!l.videoId;
-          const lesson = document.createElement("div");
-          lesson.className = "lesson";
-          lesson.draggable = true;
+          const row = document.createElement("div");
+          row.className = "lessonRow";
 
-          lesson.innerHTML = `
-            <div class="thumb" data-act="thumb">
-              ${hasVid ? `<img src="${escapeAttr(ytThumb(l.videoId))}" alt="YouTube thumbnail" />` : `<div class="mono" style="padding:12px;">Add a YouTube link</div>`}
-              <div class="playBadge">${hasVid ? `Lesson ${li + 1}` : "Draft"}</div>
+          const rewardBadge = `${l.watched ? "🥉" : ""}${l.understood ? " 🥈" : ""}`.trim() || "—";
+
+          row.innerHTML = `
+            <div class="lessonRowLeft">
+              <label class="miniLine" title="Mark completed">
+                <input type="checkbox" ${l.completed ? "checked" : ""} data-act="done" />
+                <span>Done</span>
+              </label>
+
+              <div style="min-width:0;">
+                <div class="lessonRowTitle">${escapeHtml(l.title || "Lesson")}</div>
+                <div class="lessonRowSub">
+                  <span class="chip">Rewards: ${escapeHtml(rewardBadge)}</span>
+                  <a class="link" href="${escapeAttr(ytWatch(l.videoId||""))}" target="_blank" rel="noreferrer">YouTube</a>
+                  <span class="mono">${escapeHtml(l.videoId || "")}</span>
+                </div>
+              </div>
             </div>
 
-            <div class="lessonBody">
-              <div class="lessonTop">
-                <div class="mono">${hasVid ? `Video ID: ${escapeHtml(l.videoId)}` : "No video yet"}</div>
-                <div style="display:flex; gap:8px; flex-wrap: wrap;">
-                  <button class="miniBtn" data-act="up">↑</button>
-                  <button class="miniBtn" data-act="down">↓</button>
-                  <button class="miniBtn miniDanger" data-act="del">Delete</button>
-                </div>
-              </div>
-
-              <div class="lessonFields">
-                <div class="field">
-                  <label>Lesson title</label>
-                  <input data-act="title" value="${escapeAttr(l.title || "")}" placeholder="e.g. Understanding offsets" />
-                </div>
-                <div class="field">
-                  <label>YouTube link</label>
-                  <input data-act="url" value="${escapeAttr(l.url || "")}" placeholder="Paste a YouTube URL…" />
-                </div>
-              </div>
+            <div class="lessonActions">
+              <button class="iconBtn" data-act="up">↑</button>
+              <button class="iconBtn" data-act="down">↓</button>
+              <button class="iconBtn" data-act="watch">Watch</button>
+              <button class="iconBtn" data-act="edit">Edit</button>
+              <button class="iconBtn danger" data-act="del">Delete</button>
             </div>
           `;
 
-          // click thumbnail to watch — NO inline JS (prevents your SyntaxError)
-          lesson.querySelector('[data-act="thumb"]').addEventListener("click", () => {
-            const c = activeCourse();
-            const flat = flattenLessons(c);
-            const idx = flat.findIndex(x => x.lessonId === l.id);
-            if (idx >= 0) setWatchIndex(idx);
+          row.querySelector('[data-act="done"]').addEventListener("change", (e) => {
+            updateLesson(m.id, l.id, { completed: !!e.target.checked });
           });
 
-          lesson.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
-          lesson.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
-          lesson.querySelector('[data-act="del"]').addEventListener("click", () => removeLesson(m.id, l.id));
+          row.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
+          row.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
+          row.querySelector('[data-act="watch"]').addEventListener("click", () => setPlaying(l.id));
 
-          lesson.querySelector('[data-act="title"]').addEventListener("input", (e) => {
-            updateLesson(m.id, l.id, { title: e.target.value });
-            renderPlayer(); // keep player subtitle up to date
-          });
-
-          lesson.querySelector('[data-act="url"]').addEventListener("input", (e) => {
-            const url = e.target.value.trim();
+          row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+            const title = prompt("Lesson title", l.title || "");
+            if (title == null) return;
+            const url = prompt("YouTube URL", l.url || "");
+            if (url == null) return;
             const vid = extractVideoId(url);
-            updateLesson(m.id, l.id, { url, videoId: vid || "" });
-            renderSidebarOnly();
-            renderPlayer();
+            updateLesson(m.id, l.id, { title: title.trim() || "Lesson", url: url.trim(), videoId: vid || "" });
           });
 
-          lesson.addEventListener("dragstart", (e) => {
-            lesson.classList.add("dragging");
-            e.dataTransfer.setData("text/plain", l.id);
-            e.dataTransfer.effectAllowed = "move";
-          });
-          lesson.addEventListener("dragend", () => lesson.classList.remove("dragging"));
-          lesson.addEventListener("dragover", (e) => e.preventDefault());
-          lesson.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const fromId = e.dataTransfer.getData("text/plain");
-            const toId = l.id;
-            if (!fromId || fromId === toId) return;
-            reorderLessonById(m.id, fromId, toId);
+          row.querySelector('[data-act="del"]').addEventListener("click", async () => {
+            const ok = await confirmModal("Delete lesson?", `Delete "${l.title}"?`, "Delete");
+            if (!ok) return;
+            removeLesson(m.id, l.id);
           });
 
-          lessonsEl.appendChild(lesson);
+          body.appendChild(row);
         });
       }
 
-      els.modules.appendChild(mod);
-    });
+      // add quick lesson
+      const addWrap = document.createElement("div");
+      addWrap.className = "lessonRow";
+      addWrap.innerHTML = `
+        <div class="lessonRowLeft">
+          <div class="lessonRowTitle">+ Add blank lesson</div>
+          <div class="lessonRowSub">Creates an empty lesson you can edit.</div>
+        </div>
+        <div class="lessonActions">
+          <button class="iconBtn miniPrimary" data-act="add">Add</button>
+        </div>
+      `;
+      addWrap.querySelector('[data-act="add"]').addEventListener("click", () => {
+        const newLesson = { id: uid(), videoId: "", url: "", title: "New lesson", completed: false, watched: false, understood: false, notes: "" };
+        lib.courses = lib.courses.map(course => {
+          if (course.id !== lib.activeId) return course;
+          return { ...course, modules: (course.modules || []).map(mm => mm.id === m.id ? { ...mm, lessons: [...(mm.lessons || []), newLesson] } : mm) };
+        });
+        saveLib();
+      });
+      body.appendChild(addWrap);
 
-    renderSidebarOnly();
-    renderPlayer();
+      els.modules.appendChild(wrap);
+    });
   }
 
-  // ---------- events ----------
+  // ---------- wire up ----------
   els.newCourseBtn.addEventListener("click", newCourse);
-  els.courseSearch.addEventListener("input", renderSidebarOnly);
+  els.exportLibraryBtn.addEventListener("click", exportLibrary);
+  els.importLibraryBtn.addEventListener("click", importLibrary);
 
   els.courseTitle.addEventListener("input", (e) => updateCourseTitle(e.target.value));
 
-  els.addBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    const targetModuleId = els.moduleSelect.value || c?.modules?.[0]?.id;
-    if (!targetModuleId) return;
-    addLessonsToModule(targetModuleId);
-  });
-
+  els.addBtn.addEventListener("click", () => addLessonsToModule(els.moduleSelect.value));
   els.addModuleBtn.addEventListener("click", addModule);
 
-  els.startWatchingBtn.addEventListener("click", startWatching);
-  els.prevBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    if (!c) return;
-    setWatchIndex((c.watchIndex || 0) - 1);
-  });
-  els.nextBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    if (!c) return;
-    setWatchIndex((c.watchIndex || 0) + 1);
-  });
+  els.startWatchingBtn.addEventListener("click", resume);
+
+  els.prevBtn.addEventListener("click", () => playerPrevNext(-1));
+  els.nextBtn.addEventListener("click", () => playerPrevNext(+1));
 
   els.exportCourseBtn.addEventListener("click", () => {
     const c = activeCourse();
-    const blob = new Blob([JSON.stringify({ version: 2, course: c }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(c, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = (c?.title || "course").replace(/[^\w\-]+/g, "_").slice(0,40) + ".json";
+    a.download = `${(c.title || "course").replaceAll(/[^a-z0-9]+/gi, "_").toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   });
 
-  els.deleteCourseBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    if (!c) return;
-    deleteCourse(c.id);
-  });
+  els.deleteCourseBtn.addEventListener("click", () => deleteCourse(lib.activeId));
 
-  els.exportLibraryBtn.addEventListener("click", exportLibrary);
-  els.importLibraryBtn.addEventListener("click", importLibrary);
+  document.addEventListener("click", () => closeAllMenus());
+  els.courseSearch.addEventListener("input", renderSidebarOnly);
 
   // ---------- init ----------
-  let lib = loadLib() ?? seedLib();
-  migrateFromV1IfNeeded();
-  lib = normalizeLib(lib);
-  localStorage.setItem(LIB_KEY, JSON.stringify(lib));
   render();
 </script>
 </body>
