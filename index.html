@@ -773,6 +773,9 @@
           <button class="btn btnGhost" id="exportLibraryBtn">Export</button>
           <button class="btn btnGhost" id="importLibraryBtn">Import</button>
         </div>
+        <div style="margin-top: 8px;">
+          <button class="btn btnGhost" id="signOutBtn" style="width: 100%;">Sign Out</button>
+        </div>
       </div>
     </aside>
 
@@ -897,10 +900,40 @@
     </div>
   </div>
 
+  <!-- Login modal -->
+  <div class="modalBack" id="loginModal" style="display: flex;" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width: 420px;">
+      <div class="modalHeader">
+        <h4>Welcome to StudyMate</h4>
+      </div>
+      <div class="modalBody">
+        <p style="margin-bottom: 16px; color: var(--muted);">Sign in to sync your courses across devices</p>
+        
+        <div id="authError" style="display: none; padding: 10px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 12px; margin-bottom: 12px; color: #fca5a5; font-size: 13px;"></div>
+        
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="authEmail" placeholder="your@email.com" />
+        </div>
+        
+        <div class="field" style="margin-top: 12px;">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="modalActions">
+        <button class="btn" id="loginBtn">Sign In</button>
+        <button class="btn btnGhost" id="signupBtn">Create Account</button>
+        <button class="btn btnGhost" id="guestBtn">Continue as Guest</button>
+      </div>
+    </div>
+  </div>
+
 <script type="module">
   // Firebase imports
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   // Firebase configuration
   const firebaseConfig = {
@@ -915,10 +948,11 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
 
   const LIB_KEY = "study_mate_library_v1";
   const FIREBASE_SYNC_ENABLED = true; // Set to false to disable Firebase sync
-  const USER_ID = "default_user"; // In production, this would be from authentication
+  let USER_ID = null; // Will be set after authentication
 
   const els = {
     // sidebar
@@ -1062,7 +1096,7 @@
 
   // Firebase sync functions
   async function syncToFirebase() {
-    if (!FIREBASE_SYNC_ENABLED || !db) return;
+    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return;
     try {
       const userDocRef = doc(db, "users", USER_ID);
       await setDoc(userDocRef, {
@@ -1078,7 +1112,7 @@
   }
 
   async function loadFromFirebase() {
-    if (!FIREBASE_SYNC_ENABLED || !db) return null;
+    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return null;
     try {
       const userDocRef = doc(db, "users", USER_ID);
       const docSnap = await getDoc(userDocRef);
@@ -1107,7 +1141,7 @@
 
   // Setup real-time sync listener
   function setupFirebaseListener() {
-    if (!FIREBASE_SYNC_ENABLED || !db) return;
+    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return;
     const userDocRef = doc(db, "users", USER_ID);
     onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
@@ -1222,19 +1256,115 @@
   let lib = normalizeLib(loadLib() ?? seedLib());
   localStorage.setItem(LIB_KEY, JSON.stringify(lib));
 
-  // Load from Firebase on startup
-  (async function initFirebase() {
-    const firebaseLib = await loadFromFirebase();
-    if (firebaseLib) {
-      lib = normalizeLib(firebaseLib);
-      localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-      render();
-      console.log("📥 Loaded from Firebase on startup");
-    }
-    setupFirebaseListener();
-  })();
-
   let playingLessonId = ""; // UI state only
+
+  // Authentication handlers
+  const loginModal = document.getElementById('loginModal');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authError = document.getElementById('authError');
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const guestBtn = document.getElementById('guestBtn');
+
+  function showAuthError(message) {
+    authError.textContent = message;
+    authError.style.display = 'block';
+  }
+
+  function hideAuthError() {
+    authError.style.display = 'none';
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    hideAuthError();
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+    
+    if (!email || !password) {
+      showAuthError('Please enter email and password');
+      return;
+    }
+
+    try {
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Login error:', error);
+      showAuthError(error.message || 'Sign in failed. Please try again.');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In';
+    }
+  });
+
+  signupBtn.addEventListener('click', async () => {
+    hideAuthError();
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+    
+    if (!email || !password) {
+      showAuthError('Please enter email and password');
+      return;
+    }
+
+    if (password.length < 6) {
+      showAuthError('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      signupBtn.disabled = true;
+      signupBtn.textContent = 'Creating account...';
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Signup error:', error);
+      showAuthError(error.message || 'Account creation failed. Please try again.');
+      signupBtn.disabled = false;
+      signupBtn.textContent = 'Create Account';
+    }
+  });
+
+  guestBtn.addEventListener('click', async () => {
+    hideAuthError();
+    try {
+      guestBtn.disabled = true;
+      guestBtn.textContent = 'Loading...';
+      await signInAnonymously(auth);
+    } catch (error) {
+      console.error('Guest login error:', error);
+      showAuthError('Guest login failed. Please try again.');
+      guestBtn.disabled = false;
+      guestBtn.textContent = 'Continue as Guest';
+    }
+  });
+
+  // Auth state listener
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      USER_ID = user.uid;
+      loginModal.style.display = 'none';
+      
+      // Load user's data from Firebase
+      const firebaseLib = await loadFromFirebase();
+      if (firebaseLib) {
+        lib = normalizeLib(firebaseLib);
+        localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+        render();
+        console.log("📥 Loaded from Firebase for user:", USER_ID);
+      } else {
+        // First time user - sync local data to cloud
+        await syncToFirebase();
+        console.log("📤 Synced local data to Firebase for new user");
+      }
+      
+      setupFirebaseListener();
+      updateSyncStatus(user.isAnonymous ? "Guest mode" : "Signed in");
+    } else {
+      // Not logged in - show login modal
+      loginModal.style.display = 'flex';
+    }
+  });
 
   // ---------- library actions ----------
   function newCourse(){
@@ -2023,6 +2153,21 @@
 
   els.exportLibraryBtn.addEventListener("click", exportLibrary);
   els.importLibraryBtn.addEventListener("click", importLibrary);
+
+  // Sign out button
+  document.getElementById('signOutBtn').addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      updateSyncStatus("Signed out");
+      // Clear local data
+      lib = normalizeLib(seedLib());
+      localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+      render();
+    } catch (error) {
+      console.error('Sign out error:', error);
+      alert('Failed to sign out');
+    }
+  });
 
   // initial
   render();
