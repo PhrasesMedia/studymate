@@ -1131,14 +1131,17 @@ https://youtube.com/watch?v=..."></textarea>
 
         ${playingLesson ? `
         <div style="padding: 24px; border-top: 1px solid var(--border-gray); background: white;">
-          <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Notes</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Notes</h3>
+            <button class="btn btn-primary btn-small" id="addVideoTimestampBtn">+ Add Timestamp</button>
+          </div>
           <textarea 
             id="lessonNotesArea" 
             class="form-input" 
-            placeholder="Start typing to add a note. Each new line will automatically get a timestamp..."
+            placeholder="Type your notes here. Click 'Add Timestamp' to insert video time (e.g., [5:30])..."
             style="min-height: 200px; font-size: 14px; line-height: 1.6;">${playingLesson.notes || ''}</textarea>
           <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
-            Notes auto-save as you type. Press Enter for a new timestamped note.
+            Notes auto-save as you type. Click "Add Timestamp" to mark the current video time.
           </div>
         </div>
         ` : ''}
@@ -1149,47 +1152,39 @@ https://youtube.com/watch?v=..."></textarea>
 
     document.getElementById('backToCoursesBtn').addEventListener('click', renderCourses);
 
-    // Notes auto-save and auto-timestamp functionality
+    // Notes auto-save functionality
     if (playingLesson) {
       const notesArea = document.getElementById('lessonNotesArea');
+      const addTimestampBtn = document.getElementById('addVideoTimestampBtn');
       let saveTimeout;
-      let lastNoteHadTimestamp = false;
       
-      notesArea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const now = new Date();
-          const timestamp = `[${now.toLocaleTimeString()}]`;
-          const cursorPos = notesArea.selectionStart;
-          const textBefore = notesArea.value.substring(0, cursorPos);
-          const textAfter = notesArea.value.substring(cursorPos);
-          
-          // Add newline and timestamp
-          notesArea.value = textBefore + '\n' + timestamp + ' ' + textAfter;
-          notesArea.selectionStart = notesArea.selectionEnd = cursorPos + timestamp.length + 2;
-          
-          // Trigger save
-          playingLesson.notes = notesArea.value;
-          saveLib();
-          lastNoteHadTimestamp = true;
-        }
-      });
-      
-      notesArea.addEventListener('input', (e) => {
-        // If the textarea is empty and user starts typing, add timestamp
-        if (notesArea.value.length === 1 && notesArea.value.trim() !== '') {
-          const now = new Date();
-          const timestamp = `[${now.toLocaleTimeString()}] `;
-          notesArea.value = timestamp + notesArea.value;
-          notesArea.selectionStart = notesArea.selectionEnd = timestamp.length + 1;
-        }
-        
+      notesArea.addEventListener('input', () => {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
           playingLesson.notes = notesArea.value;
           saveLib();
           console.log('Notes saved');
-        }, 500); // Auto-save after 500ms of no typing
+        }, 500);
+      });
+
+      // Add video timestamp button
+      addTimestampBtn.addEventListener('click', () => {
+        const timestamp = prompt('Enter video timestamp (e.g., 5:30 or 1:25:45):');
+        if (timestamp && timestamp.trim()) {
+          const formattedTimestamp = `[${timestamp.trim()}]`;
+          const cursorPos = notesArea.selectionStart;
+          const textBefore = notesArea.value.substring(0, cursorPos);
+          const textAfter = notesArea.value.substring(cursorPos);
+          
+          // Insert timestamp at cursor position
+          notesArea.value = textBefore + formattedTimestamp + ' ' + textAfter;
+          notesArea.focus();
+          notesArea.selectionStart = notesArea.selectionEnd = cursorPos + formattedTimestamp.length + 1;
+          
+          // Trigger save
+          playingLesson.notes = notesArea.value;
+          saveLib();
+        }
       });
     }
 
