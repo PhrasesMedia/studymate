@@ -1079,27 +1079,6 @@ https://youtube.com/watch?v=..."></textarea>
     });
   }
 
-  function renderNotes(lesson) {
-    if (!lesson.lessonNotes || lesson.lessonNotes.length === 0) {
-      return '<div style="color: var(--text-secondary); font-size: 14px; padding: 12px; text-align: center; background: var(--bg-gray); border-radius: 8px;">No notes yet. Click "+ Add Note" to get started.</div>';
-    }
-
-    return lesson.lessonNotes.map(note => `
-      <div style="padding: 12px; border: 1px solid var(--border-gray); border-radius: 8px; background: white;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="display: inline-flex; padding: 4px 8px; background: rgba(0, 115, 177, 0.1); color: var(--linkedin-blue); border-radius: 4px; font-size: 12px; font-weight: 600;">
-              ⏱️ ${note.timestamp}
-            </span>
-          </div>
-          <button class="delete-note-btn" data-note-id="${note.id}" style="border: none; background: transparent; color: var(--text-secondary); cursor: pointer; padding: 4px 8px; font-size: 16px;" title="Delete note">🗑️</button>
-        </div>
-        <div style="font-size: 14px; line-height: 1.5; color: var(--text-primary);">${note.text.replace(/\n/g, '<br>')}</div>
-        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">${new Date(note.createdAt).toLocaleDateString()} at ${new Date(note.createdAt).toLocaleTimeString()}</div>
-      </div>
-    `).join('');
-  }
-
   function openCourse(courseId) {
     lib.activeId = courseId;
     const course = lib.courses.find(c => c.id === courseId);
@@ -1146,29 +1125,15 @@ https://youtube.com/watch?v=..."></textarea>
         </div>
 
         ${playingLesson ? `
-        <div style="padding: 24px; border-bottom: 1px solid var(--border-gray);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Lesson Notes</h3>
-            <button class="btn btn-primary btn-small" id="addNoteBtn">+ Add Note</button>
-          </div>
-          
-          <div id="notesContainer" style="display: grid; gap: 12px;">
-            ${renderNotes(playingLesson)}
-          </div>
-
-          <div id="newNoteForm" style="display: none; margin-top: 16px; padding: 16px; background: var(--bg-gray); border-radius: 8px;">
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label">Timestamp (optional)</label>
-              <input type="text" class="form-input" id="noteTimestamp" placeholder="e.g., 5:30 or leave blank for current time" />
-            </div>
-            <div class="form-group" style="margin-bottom: 12px;">
-              <label class="form-label">Note</label>
-              <textarea class="form-input" id="noteText" placeholder="Write your note here..." style="min-height: 80px;"></textarea>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-primary btn-small" id="saveNoteBtn">Save Note</button>
-              <button class="btn btn-secondary btn-small" id="cancelNoteBtn">Cancel</button>
-            </div>
+        <div style="padding: 24px; border-top: 1px solid var(--border-gray); background: white;">
+          <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Notes</h3>
+          <textarea 
+            id="lessonNotesArea" 
+            class="form-input" 
+            placeholder="Take notes while watching... Type a timestamp like [5:30] to mark important moments."
+            style="min-height: 200px; font-size: 14px; line-height: 1.6;">${playingLesson.notes || ''}</textarea>
+          <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+            Notes auto-save as you type
           </div>
         </div>
         ` : ''}
@@ -1179,58 +1144,18 @@ https://youtube.com/watch?v=..."></textarea>
 
     document.getElementById('backToCoursesBtn').addEventListener('click', renderCourses);
 
-    // Notes functionality
+    // Notes auto-save functionality
     if (playingLesson) {
-      const addNoteBtn = document.getElementById('addNoteBtn');
-      const newNoteForm = document.getElementById('newNoteForm');
-      const saveNoteBtn = document.getElementById('saveNoteBtn');
-      const cancelNoteBtn = document.getElementById('cancelNoteBtn');
-
-      addNoteBtn.addEventListener('click', () => {
-        newNoteForm.style.display = 'block';
-        document.getElementById('noteText').focus();
-      });
-
-      cancelNoteBtn.addEventListener('click', () => {
-        newNoteForm.style.display = 'none';
-        document.getElementById('noteTimestamp').value = '';
-        document.getElementById('noteText').value = '';
-      });
-
-      saveNoteBtn.addEventListener('click', () => {
-        const timestamp = document.getElementById('noteTimestamp').value.trim();
-        const text = document.getElementById('noteText').value.trim();
-
-        if (!text) {
-          alert('Please enter a note');
-          return;
-        }
-
-        if (!playingLesson.lessonNotes) {
-          playingLesson.lessonNotes = [];
-        }
-
-        playingLesson.lessonNotes.push({
-          id: uid(),
-          timestamp: timestamp || new Date().toLocaleTimeString(),
-          text: text,
-          createdAt: new Date().toISOString()
-        });
-
-        saveLib();
-        openCourse(course.id);
-      });
-
-      // Delete note handlers
-      document.querySelectorAll('.delete-note-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const noteId = btn.dataset.noteId;
-          if (confirm('Delete this note?')) {
-            playingLesson.lessonNotes = (playingLesson.lessonNotes || []).filter(n => n.id !== noteId);
-            saveLib();
-            openCourse(course.id);
-          }
-        });
+      const notesArea = document.getElementById('lessonNotesArea');
+      let saveTimeout;
+      
+      notesArea.addEventListener('input', () => {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          playingLesson.notes = notesArea.value;
+          saveLib();
+          console.log('Notes saved');
+        }, 500); // Auto-save after 500ms of no typing
       });
     }
 
