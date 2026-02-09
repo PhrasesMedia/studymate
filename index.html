@@ -2,929 +2,739 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Study Mate</title>
+  <title>StudyMate - Learn at Your Pace</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{
-      --bg:#070b16;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.10);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.66);
-      --border: rgba(255,255,255,.14);
-      --shadow: 0 20px 70px rgba(0,0,0,.55);
-
-      --accent: #7c3aed;
-      --accent2:#2563eb;
-      --danger: #ef4444;
-      --good: #22c55e;
-
-      --r-xl: 22px;
-      --r: 16px;
-      --r-sm: 12px;
+    * { box-sizing: border-box; }
+    
+    :root {
+      --linkedin-blue: #0073b1;
+      --hover-blue: #005885;
+      --bg-gray: #f3f2ef;
+      --border-gray: #d9d9d9;
+      --text-primary: #000000de;
+      --text-secondary: #00000099;
+      --card-shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08);
+      --card-hover: 0 0 0 1px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.12);
     }
 
-    *{ box-sizing: border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color: var(--text);
-      background:
-        radial-gradient(900px 520px at 12% 12%, rgba(124,58,237,.28), transparent 60%),
-        radial-gradient(900px 520px at 90% 18%, rgba(37,99,235,.22), transparent 55%),
-        radial-gradient(700px 420px at 55% 95%, rgba(34,197,94,.10), transparent 60%),
-        var(--bg);
-      padding: 18px 14px;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+      background: var(--bg-gray);
+      color: var(--text-primary);
     }
 
-    .shell{
-      max-width: 1240px;
+    /* Top Navigation */
+    .topnav {
+      background: #fff;
+      border-bottom: 1px solid var(--border-gray);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--linkedin-blue);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--linkedin-blue);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--linkedin-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--hover-blue);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--linkedin-blue);
+      color: var(--linkedin-blue);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 115, 177, 0.08);
+    }
+
+    .user-menu {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--linkedin-blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+      max-width: 1440px;
       margin: 0 auto;
-      border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      background: linear-gradient(180deg, var(--panel2), var(--panel));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      overflow: hidden;
-      min-height: calc(100vh - 36px);
-      display: grid;
-      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      padding: 24px;
     }
 
     /* Sidebar */
-    .sidebar{
-      border-right: 1px solid var(--border);
-      background: rgba(0,0,0,.10);
-      display:flex;
-      flex-direction: column;
-      min-width: 0;
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
     }
 
-    .sideTop{
-      padding: 16px 14px 12px;
-      border-bottom: 1px solid var(--border);
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .brand{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-    }
-    .logo{
-      width: 36px; height: 36px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 12px 30px rgba(124,58,237,.22);
-      flex: 0 0 auto;
-    }
-    .brand h1{
-      margin:0;
-      font-size: 14px;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-    }
-    .brand p{
-      margin:2px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .btn{
-      appearance:none;
-      border: 1px solid transparent;
-      cursor: pointer;
-      border-radius: 14px;
-      padding: 10px 12px;
-      color: #fff;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: .01em;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      box-shadow: 0 12px 32px rgba(124,58,237,.14);
-      transition: transform .12s ease, filter .12s ease;
-      white-space: nowrap;
-    }
-    .btn:hover{ filter: brightness(1.05); }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-
-    .btnGhost{
-      background: rgba(255,255,255,.08);
-      border-color: var(--border);
-      box-shadow: none;
-      font-weight: 800;
-    }
-    .btnDanger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.35);
-      box-shadow: none;
-    }
-
-    .sideBody{
-      padding: 12px 12px 14px;
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow: auto;
-    }
-
-    input, textarea, select{
-      width: 100%;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.20);
-      color: var(--text);
-      padding: 11px 12px;
-      outline: none;
-      font-size: 14px;
-    }
-    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.42); }
-
-    .field label{
-      display:block;
-      font-size: 12px;
-      color: rgba(255,255,255,.62);
-      margin: 0 0 6px;
-    }
-
-    /* Minimal course list */
-    .courseList{ display:grid; gap: 10px; }
-
-    .courseRow{
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      background: rgba(0,0,0,.14);
-      padding: 10px;
-      cursor: pointer;
-      transition: transform .10s ease, background .10s ease, border-color .10s ease;
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-      justify-content: space-between;
-    }
-    .courseRow:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.18);
-      background: rgba(255,255,255,.06);
-    }
-    .courseRow.active{
-      border-color: rgba(124,58,237,.55);
-      background: rgba(124,58,237,.10);
-    }
-
-    .courseLeft{ min-width:0; flex: 1; }
-    .courseName{
-      font-size: 13px;
-      font-weight: 950;
-      letter-spacing: -0.01em;
-      margin: 0;
-      line-height: 1.2;
-      word-break: break-word;
-    }
-    .courseMeta{
-      margin-top: 8px;
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: rgba(255,255,255,.68);
-      font-size: 12px;
-    }
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap: 6px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.14);
-      font-size: 12px;
-      color: rgba(255,255,255,.72);
-      white-space: nowrap;
-    }
-
-    .progressWrap{
-      margin-top: 8px;
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      color: rgba(255,255,255,.64);
-      font-size: 12px;
-    }
-    .bar{
-      height: 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
+    .sidebar-section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 16px;
       overflow: hidden;
-      flex: 1;
-      min-width: 90px;
-    }
-    .bar > div{
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(34,197,94,.85), rgba(124,58,237,.85));
     }
 
-    .kebab{
-      padding: 6px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.9);
-      font-weight: 900;
-      cursor: pointer;
-      user-select: none;
-      flex: 0 0 auto;
-    }
-
-    .menuWrap{ position: relative; }
-    .menu{
-      position:absolute;
-      right:0;
-      top: 34px;
-      width: 190px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(10,12,22,.92);
-      box-shadow: 0 18px 55px rgba(0,0,0,.5);
-      overflow:hidden;
-      display:none;
-      z-index: 50;
-    }
-    .menu.open{ display:block; }
-    .menu button{
-      width:100%;
-      text-align:left;
-      border:0;
-      background: transparent;
-      color: rgba(255,255,255,.9);
-      padding: 10px 12px;
-      cursor:pointer;
-      font-weight: 800;
-      font-size: 13px;
-    }
-    .menu button:hover{ background: rgba(255,255,255,.08); }
-    .menu .danger{ color: rgba(239,68,68,.95); }
-
-    .sideFooter{
-      padding: 12px;
-      border-top: 1px solid var(--border);
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .muted{ color: rgba(255,255,255,.55); font-size: 12px; }
-
-    /* Main */
-    .main{
-      min-width: 0;
-      display:flex;
-      flex-direction: column;
-    }
-
-    .mainHeader{
-      padding: 16px 18px 12px;
-      border-bottom: 1px solid var(--border);
-      display:flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .mainHeaderLeft{
-      min-width: 260px;
-      flex: 1;
-    }
-    .mainHeaderLeft h2{
-      margin:0;
-      font-size: 18px;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-    }
-    .mainHeaderLeft p{
-      margin:4px 0 0;
-      color: var(--muted);
+    .sidebar-header {
+      padding: 12px 16px;
       font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-gray);
+    }
+
+    .sidebar-item {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .sidebar-item.active {
+      background: rgba(0, 115, 177, 0.08);
+      color: var(--linkedin-blue);
+      font-weight: 600;
+      border-left: 3px solid var(--linkedin-blue);
+    }
+
+    .sidebar-icon {
+      font-size: 18px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 400;
+      margin: 0 0 8px 0;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: rgba(0, 115, 177, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .stat-content h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    .stat-content p {
+      margin: 4px 0 0 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    /* Course Grid */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 16px;
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .filter-tab.active {
+      background: rgba(0, 115, 177, 0.1);
+      color: var(--linkedin-blue);
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .course-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .course-card:hover {
+      box-shadow: var(--card-hover);
+      transform: translateY(-2px);
+    }
+
+    .course-thumbnail {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+    }
+
+    .course-duration {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .course-content {
+      padding: 16px;
+    }
+
+    .course-type {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .course-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
       line-height: 1.3;
     }
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.16);
-      color: rgba(255,255,255,.78);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .content{
-      padding: 16px 18px 20px;
-      overflow: auto;
-    }
-
-    .builderBar{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 14px;
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.14);
-    }
-
-    textarea{
-      min-height: 90px;
-      resize: vertical;
-      line-height: 1.35;
-    }
-
-    .barRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
-
-    .modulesHeader{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-      margin-top: 12px;
-    }
-
-    .modulesHeader h3{
-      margin:0;
-      font-size: 14px;
-      color: rgba(255,255,255,.88);
-      letter-spacing: -0.01em;
-    }
-
-    .module{
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      background: rgba(255,255,255,.06);
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .moduleTop{
-      padding: 12px 12px 10px;
-      display:flex;
-      gap: 10px;
+    .course-meta {
+      display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.12);
-    }
-
-    .moduleTitle{
-      display:flex;
-      gap: 10px;
-      align-items: center;
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .moduleChip{
-      display:inline-flex;
-      align-items:center;
       gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.14);
       font-size: 12px;
-      color: rgba(255,255,255,.76);
-      white-space: nowrap;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
     }
 
-    .moduleTitle input{
-      font-weight: 900;
-      letter-spacing: -0.01em;
-      padding: 10px 12px;
-      border-radius: 12px;
+    .course-meta-dot {
+      width: 3px;
+      height: 3px;
+      background: var(--text-secondary);
+      border-radius: 50%;
     }
 
-    .moduleActions{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    /* Minimal lessons list (no video cards) */
-    .lessons{
-      padding: 12px;
-      display:grid;
-      gap: 10px;
-    }
-
-    .lessonRow{
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      background: rgba(0,0,0,.16);
-      padding: 10px;
-      display:grid;
-      grid-template-columns: 28px 1fr 1.1fr auto;
-      gap: 10px;
-      align-items:center;
-    }
-
-    .lessonRow.dragging{
-      opacity: .65;
-      outline: 2px dashed rgba(124,58,237,.45);
-    }
-
-    .check{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .check input{
-      width: 18px; height: 18px;
-      accent-color: var(--good);
-    }
-
-    .miniLine{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      color: rgba(255,255,255,.75);
-      font-size: 12px;
-    }
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
-      color: rgba(255,255,255,.70);
-    }
-
-    .miniBtn{
-      padding: 9px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.92);
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .miniBtn:active{ transform: translateY(1px); }
-    .miniDanger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.35);
-    }
-    .miniPrimary{
-      background: linear-gradient(90deg, rgba(124,58,237,.85), rgba(37,99,235,.85));
-      border-color: rgba(255,255,255,.12);
-    }
-    .miniDisabled{
-      opacity: .45;
-      pointer-events:none;
-    }
-
-    .empty{
-      margin-top: 10px;
-      border: 1px dashed rgba(255,255,255,.22);
-      border-radius: var(--r);
-      padding: 14px;
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.64);
-      line-height: 1.4;
-    }
-
-    /* Player */
-    .player{
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: var(--r);
-      background: rgba(0,0,0,.14);
-      overflow: hidden;
-    }
-
-    .playerTop{
-      padding: 12px 12px 10px;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.12);
-    }
-
-    .playerTopLeft{
-      min-width: 200px;
-    }
-    .playerTopLeft .title{
-      font-weight: 950;
-      font-size: 13px;
-      letter-spacing: -0.01em;
-      margin: 0;
-    }
-    .playerTopLeft .sub{
-      margin-top: 4px;
-      color: rgba(255,255,255,.68);
-      font-size: 12px;
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-
-    .playerFrame{
-      background: rgba(255,255,255,.04);
-      aspect-ratio: 16 / 9;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px;
-    }
-    .playerFrame iframe{
+    .progress-bar {
       width: 100%;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
       height: 100%;
-      border: 0;
-      border-radius: 12px;
-      background: rgba(0,0,0,.45);
-    }
-    .playerEmpty{
-      color: rgba(255,255,255,.65);
-      font-size: 13px;
-      text-align:center;
-      line-height: 1.4;
-      padding: 18px;
+      background: var(--linkedin-blue);
+      transition: width 0.3s;
     }
 
-
-    .playerNotes{
-      padding: 12px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.10);
-      display:grid;
-      gap: 10px;
-    }
-
-    .notesHeader{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .notesHeader .left{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap: wrap;
-    }
-
-    .trophy{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.14);
+    .progress-text {
       font-size: 12px;
-      color: rgba(255,255,255,.82);
-      white-space: nowrap;
+      color: var(--text-secondary);
     }
-    .trophy small{ color: rgba(255,255,255,.62); font-weight: 800; }
 
-    .playerList{
-      padding: 12px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      display:grid;
+    .course-actions {
+      display: flex;
       gap: 8px;
-      background: rgba(0,0,0,.10);
+      margin-top: 12px;
     }
 
-    .lessonPick{
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      background: rgba(0,0,0,.14);
-      padding: 10px;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content: space-between;
-      cursor:pointer;
-    }
-    .lessonPick.active{
-      border-color: rgba(124,58,237,.55);
-      background: rgba(124,58,237,.10);
-    }
-    .lessonPickLeft{ min-width:0; }
-    .lessonPickTitle{
+    .btn-small {
+      padding: 6px 12px;
       font-size: 13px;
-      font-weight: 900;
-      margin: 0;
-      line-height: 1.2;
-      word-break: break-word;
-    }
-    .lessonPickMeta{
-      margin-top: 4px;
-      font-size: 12px;
-      color: rgba(255,255,255,.65);
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items:center;
+      border-radius: 12px;
     }
 
-    a.link{
-      color: rgba(255,255,255,.9);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    /* confirm modal */
-    .modalBack{
+    /* Modal */
+    .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.55);
-      display:none;
+      background: rgba(0,0,0,0.5);
+      display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
-      z-index: 100;
-    }
-    .modalBack.open{ display:flex; }
-    .modal{
-      width: min(520px, 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(10,12,22,.96);
-      box-shadow: 0 24px 90px rgba(0,0,0,.6);
-      overflow: hidden;
-    }
-    .modalHeader{
-      padding: 14px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.12);
-    }
-    .modalHeader h4{
-      margin:0;
-      font-size: 14px;
-      font-weight: 950;
-      letter-spacing: -0.01em;
-    }
-    .modalBody{
-      padding: 12px 14px;
-      color: rgba(255,255,255,.75);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-    .modalActions{
-      padding: 12px 14px 14px;
-      display:flex;
-      gap: 10px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      z-index: 1000;
+      padding: 20px;
     }
 
-    @media (min-width: 980px){
-      .builderBar{
-        grid-template-columns: 1.2fr .8fr;
-        align-items: end;
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.24);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-gray);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-gray);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-gray);
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--linkedin-blue);
+      box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.1);
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .error-message {
+      background: #fff4f4;
+      border: 1px solid #ffcdd2;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 16px;
+      color: #c62828;
+      font-size: 14px;
+    }
+
+    /* Player View */
+    .player-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .video-wrapper {
+      aspect-ratio: 16/9;
+      background: #000;
+      position: relative;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+    }
+
+    .player-controls {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-gray);
+    }
+
+    .player-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .player-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .lesson-list {
+      padding: 16px;
+    }
+
+    .lesson-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 4px;
+    }
+
+    .lesson-item:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .lesson-item.active {
+      background: rgba(0, 115, 177, 0.08);
+    }
+
+    .lesson-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-gray);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .lesson-checkbox.checked {
+      background: var(--linkedin-blue);
+      border-color: var(--linkedin-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .lesson-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lesson-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .lesson-duration {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .empty-text {
+      color: var(--text-secondary);
+      margin: 0 0 24px 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 16px;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .course-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr;
       }
     }
-
-    @media (max-width: 980px){
-      .shell{ grid-template-columns: 1fr; }
-      .sidebar{ border-right: 0; border-bottom: 1px solid var(--border); }
-      .lessonRow{ grid-template-columns: 28px 1fr 1fr auto; }
-    }
-
-    @media (max-width: 720px){
-      .lessonRow{ grid-template-columns: 28px 1fr; }
-      .lessonRow .urlCol{ grid-column: 1 / -1; }
-      .lessonRow .actionsCol{ grid-column: 1 / -1; justify-content:flex-end; }
-    }
-  
-    /* Advanced edit panel (collapsed by default) */
-    .editPanel{
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      background: rgba(0,0,0,.12);
-      overflow: hidden;
-    }
-    .editSummary{
-      cursor: pointer;
-      padding: 12px;
-      font-weight: 900;
-      color: rgba(255,255,255,.86);
-      list-style: none;
-      user-select: none;
-    }
-    .editSummary::-webkit-details-marker{ display:none; }
-    .editPanel[open] .editSummary{
-      border-bottom: 1px solid rgba(255,255,255,.10);
-    }
-
   </style>
 </head>
 <body>
-  <div class="shell">
+  <!-- Top Navigation -->
+  <nav class="topnav">
+    <div class="logo">
+      <div class="logo-icon">S</div>
+      <span>StudyMate</span>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-secondary" id="signOutBtn">Sign Out</button>
+      <div class="user-menu">U</div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sideTop">
-        <div class="brand">
-          <div class="logo"></div>
-          <div>
-            <h1>Study Mate</h1>
-            <p>Build + track YouTube courses</p>
-          </div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">Navigation</div>
+        <div class="sidebar-item active" data-view="my-courses">
+          <span class="sidebar-icon">📚</span>
+          <span>My Courses</span>
         </div>
-        <button class="btn btnGhost" id="newCourseBtn">+ New</button>
+        <div class="sidebar-item" data-view="in-progress">
+          <span class="sidebar-icon">▶️</span>
+          <span>In Progress</span>
+        </div>
+        <div class="sidebar-item" data-view="completed">
+          <span class="sidebar-icon">✅</span>
+          <span>Completed</span>
+        </div>
       </div>
 
-      <div class="sideBody">
-        <div class="field">
-          <label>Search courses</label>
-          <input id="courseSearch" placeholder="e.g. Excel basics" />
+      <div class="sidebar-section">
+        <div class="sidebar-header">Library</div>
+        <div class="sidebar-item">
+          <span class="sidebar-icon">⬇️</span>
+          <span>Import</span>
         </div>
-
-        <div class="courseList" id="courseList"></div>
-      </div>
-
-      <div class="sideFooter">
-        <div class="muted" id="libraryMeta">0 courses</div>
-        <div class="muted" id="syncStatus" style="opacity: 0.6; font-size: 11px; margin-top: 4px;">
-          🔄 Firebase Sync Active
-        </div>
-        <div style="display:flex; gap:8px; margin-top: 8px;">
-          <button class="btn btnGhost" id="exportLibraryBtn">Export</button>
-          <button class="btn btnGhost" id="importLibraryBtn">Import</button>
-        </div>
-        <div style="margin-top: 8px;">
-          <button class="btn btnGhost" id="signOutBtn" style="width: 100%;">Sign Out</button>
+        <div class="sidebar-item">
+          <span class="sidebar-icon">⬆️</span>
+          <span>Export</span>
         </div>
       </div>
     </aside>
 
-    <!-- Main -->
-    <main class="main">
-      <div class="mainHeader">
-        <div class="mainHeaderLeft">
-          <h2 id="mainTitle">My Course</h2>
-          <p>Build modules & lessons from YouTube links. Track completion. Click a lesson to watch.</p>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content:flex-end;">
-          <div class="pill" id="statsPill">0 modules • 0 lessons</div>
-          <div class="pill" id="progressPill">0% complete</div>
-          <button class="btn btnGhost" id="startWatchingBtn">Start / Resume</button>
-          <button class="btn btnGhost" id="exportCourseBtn">Export course</button>
-          <button class="btn btnDanger" id="deleteCourseBtn">Delete course</button>
-        </div>
-      </div>
-
-      <div class="content">
-        <!-- Player -->
-        <div class="player" id="player">
-          <div class="playerTop">
-            <div class="playerTopLeft">
-              <div class="title">Player</div>
-              <div class="sub" id="playerSub">
-                Pick a lesson to start watching.
-              </div>
-            </div>
-            <div style="display:flex; gap:8px; flex-wrap: wrap; justify-content:flex-end;">
-              <button class="miniBtn btnGhost" id="prevBtn">Prev</button>
-              <button class="miniBtn miniPrimary" id="nextBtn">Next</button>
-            </div>
-          </div>
-
-          <div class="playerFrame" id="playerFrame">
-            <div class="playerEmpty" id="playerEmpty">
-              Add a lesson with a valid YouTube link, then click it below to watch here.
-            </div>
-          </div>
-
-          
-          <div class="playerNotes" id="playerNotes" style="display:none;">
-            <div class="notesHeader">
-              <div class="left">
-                <div class="trophy" id="bronzeTrophy" title="Bronze trophy is earned the first time you play this lesson.">
-                  🥉 <strong>Bronze</strong> <small id="bronzeText">Earned</small>
-                </div>
-                <div class="trophy" id="silverTrophy" title="Silver trophy is earned when you click “I understand this”.">
-                  🥈 <strong>Silver</strong> <small id="silverText">Earned</small>
-                </div>
-              </div>
-
-              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="miniBtn miniPrimary" id="understandBtn">I understand this</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Notes for this lesson</label>
-              <textarea id="notesBox" placeholder="Write your notes here…"></textarea>
-              <div class="muted" id="notesMeta" style="margin-top:8px;">Notes are saved automatically.</div>
-            </div>
-          </div>
-
-          <div class="playerList" id="playerList"></div>
-        </div>
-
-        <!-- Builder -->
-        <div class="builderBar" style="margin-top:12px;">
-          <div class="field">
-            <label>Course title</label>
-            <input id="courseTitle" placeholder="e.g. Intro to Data Analysis (YouTube)" />
-          </div>
-
-          <div class="field">
-            <label>Add YouTube links (adds to selected module)</label>
-            <textarea id="urls" placeholder="Paste YouTube URLs (one per line)"></textarea>
-
-            <div class="barRow" style="margin-top:10px;">
-              <div class="field" style="flex: 1; min-width: 220px;">
-                <label>Target module</label>
-                <select id="moduleSelect"></select>
-              </div>
-              <button class="btn" id="addBtn">Add lessons</button>
-              <button class="btn btnGhost" id="addModuleBtn">+ Module</button>
-            </div>
-
-            <div class="muted" style="margin-top:8px;">
-              Synced to Firebase Cloud ☁️ + Local storage backup
-            </div>
-          </div>
-        </div>
-
-        <details class="editPanel">
-          <summary class="editSummary">Edit course (advanced)</summary>
-
-          <div class="modulesHeader" style="margin-top:12px;">
-            <h3>Course outline</h3>
-          </div>
-
-          <div id="modules"></div>
-          <div id="empty" class="empty" style="display:none;">
-            Add a module, then paste YouTube links to start building your course.
-          </div>
-        </details>
-      </div>
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <!-- This will be dynamically populated -->
     </main>
   </div>
 
-  <!-- Confirm modal -->
-  <div class="modalBack" id="modalBack" role="dialog" aria-modal="true">
+  <!-- Login Modal -->
+  <div class="modal-backdrop open" id="loginModal">
     <div class="modal">
-      <div class="modalHeader">
-        <h4 id="modalTitle">Confirm</h4>
+      <div class="modal-header">
+        <h2 class="modal-title">Welcome to StudyMate</h2>
       </div>
-      <div class="modalBody" id="modalBody">Are you sure?</div>
-      <div class="modalActions">
-        <button class="btn btnGhost" id="modalCancel">Cancel</button>
-        <button class="btn btnDanger" id="modalConfirm">Delete</button>
+      <div class="modal-body">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Sign in to sync your courses across devices</p>
+        
+        <div id="authError" class="error-message" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="authEmail" placeholder="your@email.com" />
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="authPassword" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="guestBtn">Continue as Guest</button>
+        <button class="btn btn-secondary" id="signupBtn">Create Account</button>
+        <button class="btn btn-primary" id="loginBtn">Sign In</button>
       </div>
     </div>
   </div>
 
-  <!-- Login modal -->
-  <div class="modalBack" id="loginModal" style="display: flex;" role="dialog" aria-modal="true">
-    <div class="modal" style="max-width: 420px;">
-      <div class="modalHeader">
-        <h4>Welcome to StudyMate</h4>
+  <!-- Add Course Modal -->
+  <div class="modal-backdrop" id="addCourseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Create New Course</h2>
       </div>
-      <div class="modalBody">
-        <p style="margin-bottom: 16px; color: var(--muted);">Sign in to sync your courses across devices</p>
-        
-        <div id="authError" style="display: none; padding: 10px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); border-radius: 12px; margin-bottom: 12px; color: #fca5a5; font-size: 13px;"></div>
-        
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="authEmail" placeholder="your@email.com" />
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Course Title</label>
+          <input type="text" class="form-input" id="newCourseTitle" placeholder="e.g., Introduction to Python Programming" />
         </div>
         
-        <div class="field" style="margin-top: 12px;">
-          <label>Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••" />
+        <div class="form-group">
+          <label class="form-label">YouTube URLs (one per line)</label>
+          <textarea class="form-input" id="newCourseUrls" placeholder="https://youtube.com/watch?v=...
+https://youtube.com/watch?v=..."></textarea>
         </div>
       </div>
-      <div class="modalActions">
-        <button class="btn" id="loginBtn">Sign In</button>
-        <button class="btn btnGhost" id="signupBtn">Create Account</button>
-        <button class="btn btnGhost" id="guestBtn">Continue as Guest</button>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelCourseBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveCourseBtn">Create Course</button>
       </div>
     </div>
   </div>
@@ -932,7 +742,7 @@
 <script type="module">
   // Firebase imports
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   // Firebase configuration
@@ -951,152 +761,44 @@
   const auth = getAuth(app);
 
   const LIB_KEY = "study_mate_library_v1";
-  const FIREBASE_SYNC_ENABLED = true; // Set to false to disable Firebase sync
-  let USER_ID = null; // Will be set after authentication
+  let USER_ID = null;
+  let lib = { activeId: "", courses: [] };
 
-  const els = {
-    // sidebar
-    newCourseBtn: document.getElementById("newCourseBtn"),
-    courseSearch: document.getElementById("courseSearch"),
-    courseList: document.getElementById("courseList"),
-    libraryMeta: document.getElementById("libraryMeta"),
-    exportLibraryBtn: document.getElementById("exportLibraryBtn"),
-    importLibraryBtn: document.getElementById("importLibraryBtn"),
-
-    // main header
-    mainTitle: document.getElementById("mainTitle"),
-    statsPill: document.getElementById("statsPill"),
-    progressPill: document.getElementById("progressPill"),
-    startWatchingBtn: document.getElementById("startWatchingBtn"),
-    exportCourseBtn: document.getElementById("exportCourseBtn"),
-    deleteCourseBtn: document.getElementById("deleteCourseBtn"),
-
-    // builder
-    courseTitle: document.getElementById("courseTitle"),
-    urls: document.getElementById("urls"),
-    moduleSelect: document.getElementById("moduleSelect"),
-    addBtn: document.getElementById("addBtn"),
-    addModuleBtn: document.getElementById("addModuleBtn"),
-    modules: document.getElementById("modules"),
-    empty: document.getElementById("empty"),
-
-    // player
-    playerSub: document.getElementById("playerSub"),
-    playerFrame: document.getElementById("playerFrame"),
-    playerEmpty: document.getElementById("playerEmpty"),
-    playerList: document.getElementById("playerList"),
-    playerNotes: document.getElementById("playerNotes"),
-    notesBox: document.getElementById("notesBox"),
-    notesMeta: document.getElementById("notesMeta"),
-    understandBtn: document.getElementById("understandBtn"),
-    bronzeTrophy: document.getElementById("bronzeTrophy"),
-    silverTrophy: document.getElementById("silverTrophy"),
-    bronzeText: document.getElementById("bronzeText"),
-    silverText: document.getElementById("silverText"),
-    prevBtn: document.getElementById("prevBtn"),
-    nextBtn: document.getElementById("nextBtn"),
-
-    // modal
-    modalBack: document.getElementById("modalBack"),
-    modalTitle: document.getElementById("modalTitle"),
-    modalBody: document.getElementById("modalBody"),
-    modalCancel: document.getElementById("modalCancel"),
-    modalConfirm: document.getElementById("modalConfirm"),
-  };
-
-  // ---------- modal ----------
-  let modalAction = null;
-  function openModal({ title, body, confirmText="Confirm", onConfirm }){
-    els.modalTitle.textContent = title;
-    els.modalBody.textContent = body;
-    els.modalConfirm.textContent = confirmText;
-    modalAction = onConfirm;
-    els.modalBack.classList.add("open");
-  }
-  function closeModal(){
-    els.modalBack.classList.remove("open");
-    modalAction = null;
-  }
-  els.modalCancel.addEventListener("click", closeModal);
-  els.modalBack.addEventListener("click", (e) => { if (e.target === els.modalBack) closeModal(); });
-  els.modalConfirm.addEventListener("click", () => {
-    if (typeof modalAction === "function") modalAction();
-    closeModal();
-  });
-
-  document.addEventListener("click", () => closeAllMenus());
-
-  // ---------- utils ----------
-  function uid(){
+  // Utility functions
+  function uid() {
     return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   }
 
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[s]));
-  }
-  function escapeAttr(str){
-    return escapeHtml(str).replace(/"/g, "&quot;");
-  }
-
-  function extractVideoId(url){
-    try{
+  function extractVideoId(url) {
+    try {
       const u = new URL(url.trim());
       if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
       if (u.searchParams.get("v")) return u.searchParams.get("v");
       if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2];
       return null;
-    }catch{
+    } catch {
       return null;
     }
   }
 
-  function ytEmbed(videoId){
-    // modestbranding is not guaranteed, but harmless. rel=0 keeps related vids closer.
-    return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?rel=0&modestbranding=1`;
-  }
-  function ytWatch(videoId){
-    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
-  }
-
-  function makeCourse(title){
-    return {
-      id: uid(),
-      title: title || "Untitled course",
-      lastLessonId: "",               // for resume
-      modules: [{ id: uid(), title: "Module 1", lessons: [] }]
-    };
+  function formatDuration(totalMinutes) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
   }
 
-  function seedLib(){
-    const first = makeCourse("My Course");
-    return { activeId: first.id, courses: [first] };
+  function getCourseProgress(course) {
+    const lessons = (course.modules || []).flatMap(m => m.lessons || []);
+    const total = lessons.length;
+    const completed = lessons.filter(l => l.completed).length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, percentage };
   }
 
-  function loadLib(){
-    try{
-      const raw = localStorage.getItem(LIB_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.courses)) return null;
-      return parsed;
-    }catch{
-      return null;
-    }
-  }
-
-  function saveLib(){
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    if (FIREBASE_SYNC_ENABLED) {
-      syncToFirebase();
-    }
-    render();
-  }
-
-  // Firebase sync functions
+  // Firebase sync
   async function syncToFirebase() {
-    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return;
+    if (!db || !USER_ID) return;
     try {
       const userDocRef = doc(db, "users", USER_ID);
       await setDoc(userDocRef, {
@@ -1104,22 +806,18 @@
         lastSync: serverTimestamp()
       });
       console.log("✅ Synced to Firebase");
-      updateSyncStatus("Synced");
     } catch (error) {
       console.error("❌ Firebase sync error:", error);
-      updateSyncStatus("Sync failed");
     }
   }
 
   async function loadFromFirebase() {
-    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return null;
+    if (!db || !USER_ID) return null;
     try {
       const userDocRef = doc(db, "users", USER_ID);
       const docSnap = await getDoc(userDocRef);
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        console.log("✅ Loaded from Firebase");
-        return data.library;
+        return docSnap.data().library;
       }
       return null;
     } catch (error) {
@@ -1128,137 +826,12 @@
     }
   }
 
-  function updateSyncStatus(status) {
-    const statusEl = document.getElementById("syncStatus");
-    if (statusEl) {
-      statusEl.textContent = status;
-      statusEl.style.opacity = "1";
-      setTimeout(() => {
-        statusEl.style.opacity = "0.6";
-      }, 2000);
-    }
+  function saveLib() {
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    syncToFirebase();
   }
 
-  // Setup real-time sync listener
-  function setupFirebaseListener() {
-    if (!FIREBASE_SYNC_ENABLED || !db || !USER_ID) return;
-    const userDocRef = doc(db, "users", USER_ID);
-    onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        const cloudLib = normalizeLib(data.library);
-        // Only update if cloud version is different
-        const currentString = JSON.stringify(lib);
-        const cloudString = JSON.stringify(cloudLib);
-        if (currentString !== cloudString) {
-          lib = cloudLib;
-          localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-          render();
-          console.log("🔄 Real-time update from Firebase");
-        }
-      }
-    });
-  }
-
-  // ✅ normalize saved data so .modules/.lessons exist + tracking fields exist
-  function normalizeLib(input){
-    const out = (input && typeof input === "object") ? input : { activeId: "", courses: [] };
-    out.courses = Array.isArray(out.courses) ? out.courses : [];
-
-    out.courses = out.courses.map(c => {
-      const course = (c && typeof c === "object") ? c : {};
-      const title = typeof course.title === "string" ? course.title : "Untitled course";
-      const lastLessonId = typeof course.lastLessonId === "string" ? course.lastLessonId : "";
-
-      let modules = Array.isArray(course.modules) ? course.modules : [];
-      modules = modules.map(m => {
-        const mod = (m && typeof m === "object") ? m : {};
-        const mTitle = typeof mod.title === "string" ? mod.title : "Module";
-
-        let lessons = Array.isArray(mod.lessons) ? mod.lessons : [];
-        lessons = lessons.map(l => {
-          const les = (l && typeof l === "object") ? l : {};
-          const url = typeof les.url === "string" ? les.url : "";
-          const vid = typeof les.videoId === "string" ? les.videoId : (url ? (extractVideoId(url) || "") : "");
-          return {
-            id: typeof les.id === "string" ? les.id : uid(),
-            title: typeof les.title === "string" ? les.title : "Lesson",
-            url,
-            videoId: vid || "",
-            completed: !!les.completed,
-            watched: !!les.watched,
-            understood: !!les.understood,
-            notes: typeof les.notes === "string" ? les.notes : ""
-          };
-        });
-
-        return {
-          id: typeof mod.id === "string" ? mod.id : uid(),
-          title: mTitle,
-          lessons
-        };
-      });
-
-      if (!modules.length) modules = [{ id: uid(), title: "Module 1", lessons: [] }];
-
-      return {
-        id: typeof course.id === "string" ? course.id : uid(),
-        title,
-        lastLessonId,
-        modules
-      };
-    });
-
-    if (!out.courses.length) {
-      const first = makeCourse("My Course");
-      out.courses = [first];
-      out.activeId = first.id;
-    }
-
-    if (!out.courses.some(c => c.id === out.activeId)) {
-      out.activeId = out.courses[0].id;
-    }
-
-    return out;
-  }
-
-  function activeCourse(){
-    return lib.courses.find(c => c.id === lib.activeId);
-  }
-
-  function flattenLessons(course){
-    const list = [];
-    (course.modules || []).forEach((m, mi) => {
-      (m.lessons || []).forEach((l, li) => {
-        list.push({
-          moduleId: m.id,
-          moduleIndex: mi,
-          lessonId: l.id,
-          lessonIndex: li,
-          lesson: l,
-          moduleTitle: m.title
-        });
-      });
-    });
-    return list;
-  }
-
-  function courseStats(course){
-    const flat = flattenLessons(course);
-    const total = flat.length;
-    const done = flat.filter(x => x.lesson.completed).length;
-    const pct = total ? Math.round((done / total) * 100) : 0;
-    return { total, done, pct };
-  }
-
-  // ---------- state ----------
-  // Initialize library (will be replaced with Firebase data if available)
-  let lib = normalizeLib(loadLib() ?? seedLib());
-  localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-
-  let playingLessonId = ""; // UI state only
-
-  // Authentication handlers
+  // Authentication
   const loginModal = document.getElementById('loginModal');
   const authEmail = document.getElementById('authEmail');
   const authPassword = document.getElementById('authPassword');
@@ -1291,8 +864,7 @@
       loginBtn.textContent = 'Signing in...';
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.error('Login error:', error);
-      showAuthError(error.message || 'Sign in failed. Please try again.');
+      showAuthError(error.message || 'Sign in failed');
       loginBtn.disabled = false;
       loginBtn.textContent = 'Sign In';
     }
@@ -1318,8 +890,7 @@
       signupBtn.textContent = 'Creating account...';
       await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.error('Signup error:', error);
-      showAuthError(error.message || 'Account creation failed. Please try again.');
+      showAuthError(error.message || 'Account creation failed');
       signupBtn.disabled = false;
       signupBtn.textContent = 'Create Account';
     }
@@ -1332,8 +903,7 @@
       guestBtn.textContent = 'Loading...';
       await signInAnonymously(auth);
     } catch (error) {
-      console.error('Guest login error:', error);
-      showAuthError('Guest login failed. Please try again.');
+      showAuthError('Guest login failed');
       guestBtn.disabled = false;
       guestBtn.textContent = 'Continue as Guest';
     }
@@ -1343,834 +913,233 @@
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       USER_ID = user.uid;
-      loginModal.style.display = 'none';
+      loginModal.classList.remove('open');
       
-      // Load user's data from Firebase
       const firebaseLib = await loadFromFirebase();
       if (firebaseLib) {
-        lib = normalizeLib(firebaseLib);
-        localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-        render();
-        console.log("📥 Loaded from Firebase for user:", USER_ID);
+        lib = firebaseLib;
       } else {
-        // First time user - sync local data to cloud
+        const localLib = localStorage.getItem(LIB_KEY);
+        if (localLib) {
+          lib = JSON.parse(localLib);
+        }
         await syncToFirebase();
-        console.log("📤 Synced local data to Firebase for new user");
       }
       
-      setupFirebaseListener();
-      updateSyncStatus(user.isAnonymous ? "Guest mode" : "Signed in");
+      renderCourses();
     } else {
-      // Not logged in - show login modal
-      loginModal.style.display = 'flex';
+      loginModal.classList.add('open');
     }
   });
 
-  // ---------- library actions ----------
-  function newCourse(){
-    const c = makeCourse(`Course ${lib.courses.length + 1}`);
-    lib.courses = [c, ...lib.courses];
-    lib.activeId = c.id;
-    playingLessonId = "";
-    saveLib();
-  }
-
-  function switchCourse(id){
-    lib.activeId = id;
-    playingLessonId = "";
-    saveLib();
-  }
-
-  function duplicateCourse(courseId){
-    const src = lib.courses.find(c => c.id === courseId);
-    if (!src) return;
-
-    const copy = {
-      id: uid(),
-      title: (src.title || "Untitled") + " (Copy)",
-      lastLessonId: "",
-      modules: (src.modules || []).map(m => ({
-        id: uid(),
-        title: m.title || "Module",
-        lessons: (m.lessons || []).map(l => ({
-          id: uid(),
-          videoId: l.videoId || "",
-          url: l.url || "",
-          title: l.title || "Lesson",
-          completed: !!l.completed,
-          watched: !!l.watched,
-          understood: !!l.understood,
-          notes: typeof l.notes === "string" ? l.notes : ""
-        }))
-      }))
-    };
-
-    lib.courses = [copy, ...lib.courses];
-    lib.activeId = copy.id;
-    playingLessonId = "";
-    saveLib();
-  }
-
-  function renameCourse(courseId){
-    const c = lib.courses.find(x => x.id === courseId);
-    if (!c) return;
-    const next = prompt("Rename course:", c.title || "Untitled course");
-    if (!next) return;
-    lib.courses = lib.courses.map(x => x.id === courseId ? { ...x, title: next } : x);
-    saveLib();
-  }
-
-  function deleteCourse(courseId){
-    const c = lib.courses.find(x => x.id === courseId);
-    if (!c) return;
-
-    openModal({
-      title: "Delete course",
-      body: `This will permanently delete "${c.title || "Untitled course"}" from this browser.`,
-      confirmText: "Delete",
-      onConfirm: () => {
-        lib.courses = lib.courses.filter(x => x.id !== courseId);
-        lib = normalizeLib(lib);
-        playingLessonId = "";
-        saveLib();
-      }
-    });
-  }
-
-  function exportLibrary(){
-    const blob = new Blob([JSON.stringify({ version: 1, ...lib }, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "study-mate-library.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function importLibrary(){
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.addEventListener("change", async () => {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      try{
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        if (!parsed || !Array.isArray(parsed.courses)) return;
-
-        // Import supports older exports too (missing watched/understood/notes).
-        const cleaned = {
-          activeId: "",
-          courses: parsed.courses
-            .filter(c => c && typeof c.title === "string" && Array.isArray(c.modules))
-            .map(c => ({
-              id: uid(),
-              title: c.title,
-              lastLessonId: "",
-              modules: c.modules
-                .filter(m => m && typeof m.title === "string" && Array.isArray(m.lessons))
-                .map(m => ({
-                  id: uid(),
-                  title: m.title,
-                  lessons: m.lessons
-                    .filter(l => l && typeof l.url === "string")
-                    .map(l => ({
-                      id: uid(),
-                      url: l.url,
-                      videoId: typeof l.videoId === "string" ? l.videoId : (extractVideoId(l.url) || ""),
-                      title: typeof l.title === "string" ? l.title : "Lesson",
-                      completed: !!l.completed,
-                      watched: !!l.watched,
-                      understood: !!l.understood,
-                      notes: typeof l.notes === "string" ? l.notes : ""
-                    }))
-                }))
-            }))
-        };
-
-        if (!cleaned.courses.length) return;
-        cleaned.activeId = cleaned.courses[0].id;
-
-        lib = normalizeLib(cleaned);
-        playingLessonId = "";
-        saveLib();
-      }catch{}
-    });
-    input.click();
-  }
-
-
-  // ---------- course actions ----------
-  function updateCourseTitle(title){
-    lib.courses = lib.courses.map(c => c.id === lib.activeId ? { ...c, title } : c);
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    renderHeaderOnly();
-    renderSidebarOnly();
-  }
-
-  function addModule(){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      const mods = Array.isArray(c.modules) ? c.modules : [];
-      return { ...c, modules: [...mods, { id: uid(), title: `Module ${mods.length + 1}`, lessons: [] }] };
-    });
-    saveLib();
-  }
-
-  function removeModule(moduleId){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      let mods = (c.modules || []).filter(m => m.id !== moduleId);
-      if (!mods.length) mods = [{ id: uid(), title: "Module 1", lessons: [] }];
-      return { ...c, modules: mods };
-    });
-    saveLib();
-  }
-
-  function moveModule(moduleId, dir){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      const mods = Array.isArray(c.modules) ? c.modules : [];
-      const i = mods.findIndex(m => m.id === moduleId);
-      const j = i + dir;
-      if (i < 0 || j < 0 || j >= mods.length) return c;
-      const next = [...mods];
-      const item = next.splice(i, 1)[0];
-      next.splice(j, 0, item);
-      return { ...c, modules: next };
-    });
-    saveLib();
-  }
-
-  function updateModuleTitle(moduleId, title){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      return { ...c, modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, title } : m) };
-    });
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    renderPlayerOnly();
-    renderSidebarOnly();
-  }
-
-  function updateLesson(moduleId, lessonId, patch){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      return {
-        ...c,
-        modules: (c.modules || []).map(m => {
-          if (m.id !== moduleId) return m;
-          return { ...m, lessons: (m.lessons || []).map(l => l.id === lessonId ? { ...l, ...patch } : l) };
-        })
-      };
-    });
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    renderHeaderOnly();
-    renderPlayerOnly();
-    renderSidebarOnly();
-  }
-
-  function removeLesson(moduleId, lessonId){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      const next = {
-        ...c,
-        modules: (c.modules || []).map(m => m.id === moduleId ? { ...m, lessons: (m.lessons || []).filter(l => l.id !== lessonId) } : m)
-      };
-
-      // if we removed what we were watching, clear player
-      if (next.lastLessonId === lessonId) next.lastLessonId = "";
-      return next;
-    });
-
-    if (playingLessonId === lessonId) playingLessonId = "";
-    saveLib();
-  }
-
-  function moveLesson(moduleId, lessonIndex, dir){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      return {
-        ...c,
-        modules: (c.modules || []).map(m => {
-          if (m.id !== moduleId) return m;
-          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
-          const j = lessonIndex + dir;
-          if (j < 0 || j >= lessons.length) return m;
-          const next = [...lessons];
-          const item = next.splice(lessonIndex, 1)[0];
-          next.splice(j, 0, item);
-          return { ...m, lessons: next };
-        })
-      };
-    });
-    saveLib();
-  }
-
-  function reorderLessonById(moduleId, fromLessonId, toLessonId){
-    lib.courses = lib.courses.map(c => {
-      if (c.id !== lib.activeId) return c;
-      return {
-        ...c,
-        modules: (c.modules || []).map(m => {
-          if (m.id !== moduleId) return m;
-          const lessons = Array.isArray(m.lessons) ? m.lessons : [];
-          const fromIndex = lessons.findIndex(l => l.id === fromLessonId);
-          const toIndex = lessons.findIndex(l => l.id === toLessonId);
-          if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return m;
-
-          const next = [...lessons];
-          const moved = next.splice(fromIndex, 1)[0];
-          next.splice(toIndex, 0, moved);
-          return { ...m, lessons: next };
-        })
-      };
-    });
-    saveLib();
-  }
-
-  function addLessonsToModule(moduleId){
-    const lines = els.urls.value.split("\n").map(s => s.trim()).filter(Boolean);
-    if (!lines.length) return;
-
-    const c = activeCourse();
-    const module = (c.modules || []).find(m => m.id === moduleId);
-    if (!module) return;
-
-    const existingVideoIds = new Set((module.lessons || []).map(l => l.videoId));
-
-    const toAdd = [];
-    for (const line of lines){
-      const vid = extractVideoId(line);
-      if (!vid) continue;
-      if (existingVideoIds.has(vid)) continue;
-      toAdd.push({ id: uid(), videoId: vid, url: line.trim(), title: "New lesson", completed: false, watched: false, understood: false, notes: "" });
-      existingVideoIds.add(vid);
-    }
-    if (!toAdd.length) return;
-
-    lib.courses = lib.courses.map(course => {
-      if (course.id !== lib.activeId) return course;
-      return {
-        ...course,
-        modules: (course.modules || []).map(m => m.id === moduleId ? { ...m, lessons: [...(m.lessons || []), ...toAdd] } : m)
-      };
-    });
-
-    els.urls.value = "";
-    saveLib();
-  }
-
-  // ---------- player ----------
-  function setPlaying(lessonId){
-    const c = activeCourse();
-    const flat = flattenLessons(c);
-    const found = flat.find(x => x.lessonId === lessonId);
-    if (!found || !found.lesson.videoId) return;
-
-    playingLessonId = lessonId;
-
-    // Bronze trophy: earn on first play
-    if (!found.lesson.watched){
-      // updateLesson will persist + re-render
-      updateLesson(found.moduleId, found.lessonId, { watched: true });
-    }
-
-    lib.courses = lib.courses.map(course => {
-      if (course.id !== lib.activeId) return course;
-      return { ...course, lastLessonId: lessonId };
-    });
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-    renderPlayerOnly();
-    renderSidebarOnly();
-  }
-
-  function resume(){
-    const c = activeCourse();
-    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
-    if (!flat.length) return;
-
-    const target = (c.lastLessonId && flat.find(x => x.lessonId === c.lastLessonId)) || flat[0];
-    setPlaying(target.lessonId);
-  }
-
-  function playerPrevNext(dir){
-    const c = activeCourse();
-    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
-    if (!flat.length) return;
-
-    const idx = flat.findIndex(x => x.lessonId === playingLessonId);
-    const nextIdx = idx < 0 ? 0 : (idx + dir);
-    if (nextIdx < 0 || nextIdx >= flat.length) return;
-
-    setPlaying(flat[nextIdx].lessonId);
-  }
-
-  // ---------- menus ----------
-  function closeAllMenus(){
-    document.querySelectorAll(".menu.open").forEach(m => m.classList.remove("open"));
-  }
-
-  function toggleMenu(menuEl){
-    const isOpen = menuEl.classList.contains("open");
-    closeAllMenus();
-    if (!isOpen) menuEl.classList.add("open");
-  }
-
-  // ---------- rendering ----------
-  function renderHeaderOnly(){
-    const c = activeCourse();
-    els.mainTitle.textContent = c && c.title ? c.title : "My Course";
-    els.courseTitle.value = c && c.title ? c.title : "";
-
-    const totalModules = (c.modules || []).length;
-    const totalLessons = flattenLessons(c).length;
-    els.statsPill.textContent = `${totalModules} module${totalModules===1?"":"s"} • ${totalLessons} lesson${totalLessons===1?"":"s"}`;
-
-    const { total, done, pct } = courseStats(c);
-    els.progressPill.textContent = total ? `${pct}% complete • ${done}/${total}` : `0% complete`;
-  }
-
-  function renderSidebarOnly(){
-    const q = (els.courseSearch.value || "").toLowerCase();
-    const courses = (lib.courses || []).filter(c => (c.title || "").toLowerCase().includes(q));
-
-    els.courseList.innerHTML = "";
-    els.libraryMeta.textContent = `${lib.courses.length} course${lib.courses.length===1?"":"s"}`;
-
-    courses.forEach(c => {
-      const modCount = (c.modules || []).length;
-      const lessonCount = flattenLessons(c).length;
-      const { total, done, pct } = courseStats(c);
-
-      const row = document.createElement("div");
-      row.className = "courseRow" + (c.id === lib.activeId ? " active" : "");
-
-      row.innerHTML = `
-        <div class="courseLeft">
-          <div class="courseName">${escapeHtml(c.title || "Untitled course")}</div>
-
-          <div class="courseMeta">
-            <span class="chip">${modCount} module${modCount===1?"":"s"}</span>
-            <span class="chip">${lessonCount} lesson${lessonCount===1?"":"s"}</span>
-          </div>
-
-          <div class="progressWrap" title="${done}/${total} lessons complete">
-            <div class="bar"><div style="width:${pct}%;"></div></div>
-            <div>${pct}%</div>
-          </div>
-        </div>
-
-        <div class="menuWrap">
-          <button class="kebab" data-act="menuBtn" title="Course actions">⋯</button>
-          <div class="menu" data-act="menu">
-            <button data-act="rename">Rename</button>
-            <button data-act="duplicate">Duplicate</button>
-            <button class="danger" data-act="delete">Delete</button>
-          </div>
-        </div>
-      `;
-
-      row.addEventListener("click", (e) => {
-        const clickedMenu = e.target.closest('[data-act="menuBtn"]') || e.target.closest('[data-act="menu"]');
-        if (clickedMenu) return;
-        switchCourse(c.id);
-      });
-
-      const menuBtn = row.querySelector('[data-act="menuBtn"]');
-      const menu = row.querySelector('[data-act="menu"]');
-
-      menuBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleMenu(menu);
-      });
-      menu.addEventListener("click", (e) => e.stopPropagation());
-
-      row.querySelector('[data-act="rename"]').addEventListener("click", () => {
-        closeAllMenus();
-        renameCourse(c.id);
-      });
-      row.querySelector('[data-act="duplicate"]').addEventListener("click", () => {
-        closeAllMenus();
-        duplicateCourse(c.id);
-      });
-      row.querySelector('[data-act="delete"]').addEventListener("click", () => {
-        closeAllMenus();
-        deleteCourse(c.id);
-      });
-
-      els.courseList.appendChild(row);
-    });
-  }
-
-  function renderPlayerOnly(){
-    const c = activeCourse();
-    const flat = flattenLessons(c).filter(x => x.lesson.videoId);
-
-    // build the list
-    els.playerList.innerHTML = "";
-
-    if (!flat.length){
-      els.playerSub.textContent = "Pick a lesson to start watching.";
-      els.prevBtn.classList.add("miniDisabled");
-      els.nextBtn.classList.add("miniDisabled");
-
-      els.playerFrame.innerHTML = "";
-      const empty = document.createElement("div");
-      empty.className = "playerEmpty";
-      empty.textContent = "Add a lesson with a valid YouTube link, then click it below to watch here.";
-      els.playerFrame.appendChild(empty);
-
-      // hide notes/rewards panel when nothing is selected
-      if (els.playerNotes) els.playerNotes.style.display = "none";
-      return;
-    }
-
-    // resolve current
-    let idx = flat.findIndex(x => x.lessonId === playingLessonId);
-    if (idx < 0) idx = c.lastLessonId ? flat.findIndex(x => x.lessonId === c.lastLessonId) : -1;
-    if (idx < 0) idx = 0;
-
-    const current = flat[idx];
-    const lessonTitle = (current.lesson.title || "Lesson").trim() || "Lesson";
-
-    // player top
-    const doneMark = current.lesson.completed ? "✅ Completed" : "Not completed";
-    const bronze = current.lesson.watched ? "🥉" : "—";
-    const silver = current.lesson.understood ? "🥈" : "—";
-
-    els.playerSub.innerHTML = `
-      <span class="mono">${idx + 1} of ${flat.length}</span>
-      <span>—</span>
-      <span>${escapeHtml(lessonTitle)}</span>
-      <span>•</span>
-      <span>${doneMark}</span>
-      <span>•</span>
-      <span title="Rewards">${bronze} ${silver}</span>
-      <span>•</span>
-      <a class="link" href="${escapeAttr(ytWatch(current.lesson.videoId))}" target="_blank" rel="noreferrer">Open on YouTube</a>
-    `;
-
-    // prev/next disabled states
-    if (idx <= 0) els.prevBtn.classList.add("miniDisabled"); else els.prevBtn.classList.remove("miniDisabled");
-    if (idx >= flat.length - 1) els.nextBtn.classList.add("miniDisabled"); else els.nextBtn.classList.remove("miniDisabled");
-
-    // render iframe
-    els.playerFrame.innerHTML = `
-      <iframe
-        title="YouTube player"
-        src="${escapeAttr(ytEmbed(current.lesson.videoId))}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen></iframe>
-    `;
-
-    // show notes/rewards
-    if (els.playerNotes){
-      els.playerNotes.style.display = "grid";
-
-      // ✅ Only show trophies once earned
-      const bronzeBadge = els.bronzeTrophy || document.getElementById("bronzeTrophy");
-      const silverBadge = els.silverTrophy || document.getElementById("silverTrophy");
-      if (bronzeBadge) bronzeBadge.style.display = current.lesson.watched ? "inline-flex" : "none";
-      if (silverBadge) silverBadge.style.display = current.lesson.understood ? "inline-flex" : "none";
-
-      // Understand button
-      if (els.understandBtn){
-        if (current.lesson.understood){
-          els.understandBtn.textContent = "Understood ✓";
-          els.understandBtn.classList.add("miniDisabled");
-        } else {
-          els.understandBtn.textContent = "I understand this";
-          els.understandBtn.classList.remove("miniDisabled");
-        }
-
-        els.understandBtn.onclick = () => {
-          if (current.lesson.understood) return;
-          updateLesson(current.moduleId, current.lessonId, { understood: true });
-        };
-      }
-
-      // Notes box
-      if (els.notesBox){
-        els.notesBox.value = current.lesson.notes || "";
-        els.notesBox.oninput = (e) => {
-          const val = e.target.value;
-
-          if (els.notesMeta) els.notesMeta.textContent = "Saving…";
-          if (notesTimer) clearTimeout(notesTimer);
-
-          notesTimer = setTimeout(() => {
-            // ✅ Update in-memory without re-rendering the player/iframe
-            const course = activeCourse();
-            for (const m of (course.modules || [])) {
-              if (m.id !== current.moduleId) continue;
-              const lesson = (m.lessons || []).find(l => l.id === current.lessonId);
-              if (!lesson) break;
-              lesson.notes = val;
-              break;
-            }
-
-            // ✅ Persist only (no render)
-            localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-
-            if (els.notesMeta) els.notesMeta.textContent = "Notes are saved automatically.";
-          }, 250);
-        };
-      }
-    }
-
-    // list of lessons under player
-    flat.forEach((x, i) => {
-      const item = document.createElement("div");
-      const active = x.lessonId === current.lessonId;
-      item.className = "lessonPick" + (active ? " active" : "");
-
-      const state = x.lesson.completed ? "✓" : "•";
-      const b = x.lesson.watched ? "🥉" : "";
-      const s = x.lesson.understood ? "🥈" : "";
-      const rewards = (b || s) ? `${b}${b && s ? " " : ""}${s}` : "—";
-
-      const label = `${state} ${i + 1}. ${x.lesson.title || "Lesson"}`;
-
-      item.innerHTML = `
-        <div class="lessonPickLeft" style="min-width:0;">
-          <div class="lessonPickTitle">${escapeHtml(label)}</div>
-          <div class="lessonPickMeta">
-            <span class="chip">${escapeHtml(x.moduleTitle || "Module")}</span>
-            <span class="mono">ID: ${escapeHtml(x.lesson.videoId)}</span>
-            <span class="chip" title="Rewards">${escapeHtml(rewards)}</span>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <label class="miniLine" title="Mark completed">
-            <input type="checkbox" ${x.lesson.completed ? "checked" : ""} data-act="done" />
-            <span>Done</span>
-          </label>
-          <button class="miniBtn miniPrimary" data-act="play">Play</button>
-        </div>
-      `;
-
-      item.querySelector('[data-act="play"]').addEventListener("click", (e) => {
-        e.stopPropagation();
-        playingLessonId = x.lessonId;
-        setPlaying(x.lessonId);
-      });
-
-      item.querySelector('[data-act="done"]').addEventListener("change", (e) => {
-        e.stopPropagation();
-        updateLesson(x.moduleId, x.lessonId, { completed: !!e.target.checked });
-      });
-
-      item.addEventListener("click", () => setPlaying(x.lessonId));
-      els.playerList.appendChild(item);
-    });
-
-    // keep state aligned
-    playingLessonId = current.lessonId;
-    lib.courses = lib.courses.map(course => course.id === lib.activeId ? { ...course, lastLessonId: current.lessonId } : course);
-    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-  }
-
-  function render(){
-    lib = normalizeLib(lib);
-    const c = activeCourse();
-    renderHeaderOnly();
-
-    // module select
-    els.moduleSelect.innerHTML = "";
-    (c.modules || []).forEach((m, idx) => {
-      const opt = document.createElement("option");
-      opt.value = m.id;
-      opt.textContent = `${idx + 1}. ${m.title}`;
-      els.moduleSelect.appendChild(opt);
-    });
-
-    // modules/lessons
-    els.modules.innerHTML = "";
-    els.empty.style.display = (c.modules || []).length ? "none" : "block";
-
-    (c.modules || []).forEach((m, moduleIndex) => {
-      const mod = document.createElement("section");
-      mod.className = "module";
-
-      mod.innerHTML = `
-        <div class="moduleTop">
-          <div class="moduleTitle">
-            <span class="moduleChip">Module ${moduleIndex + 1}</span>
-            <input value="${escapeAttr(m.title)}" aria-label="Module title" />
-          </div>
-          <div class="moduleActions">
-            <button class="btn btnGhost" data-act="addOne">+ Lesson</button>
-            <button class="btn btnGhost" data-act="up">↑</button>
-            <button class="btn btnGhost" data-act="down">↓</button>
-            <button class="btn btnDanger" data-act="del">Delete</button>
-          </div>
-        </div>
-        <div class="lessons"></div>
-      `;
-
-      mod.querySelector("input").addEventListener("input", (e) => updateModuleTitle(m.id, e.target.value));
-      mod.querySelector('[data-act="addOne"]').addEventListener("click", () => {
-        const newLesson = { id: uid(), videoId: "", url: "", title: "New lesson", completed: false, watched: false, understood: false, notes: "" };
-        lib.courses = lib.courses.map(course => {
-          if (course.id !== lib.activeId) return course;
-          return { ...course, modules: (course.modules || []).map(mm => mm.id === m.id ? { ...mm, lessons: [...(mm.lessons || []), newLesson] } : mm) };
-        });
-        saveLib();
-      });
-      mod.querySelector('[data-act="up"]').addEventListener("click", () => moveModule(m.id, -1));
-      mod.querySelector('[data-act="down"]').addEventListener("click", () => moveModule(m.id, +1));
-      mod.querySelector('[data-act="del"]').addEventListener("click", () => removeModule(m.id));
-
-      const lessonsEl = mod.querySelector(".lessons");
-
-      if (!(m.lessons || []).length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "No lessons yet. Paste YouTube links above and click “Add lessons”, or click “+ Lesson”.";
-        lessonsEl.appendChild(empty);
-      } else {
-        (m.lessons || []).forEach((l, li) => {
-          const row = document.createElement("div");
-          row.className = "lessonRow";
-          row.draggable = true;
-
-          const displayId = l.videoId ? `ID: ${l.videoId}` : "No video yet";
-          const safeTitle = escapeAttr(l.title || "");
-          const safeUrl = escapeAttr(l.url || "");
-
-          row.innerHTML = `
-            <div class="check">
-              <input type="checkbox" ${l.completed ? "checked" : ""} title="Mark completed" />
-            </div>
-
-            <div style="min-width:0;">
-              <div class="miniLine">
-                <span class="mono">${li + 1}.</span>
-                <span class="mono">${escapeHtml(displayId)}</span>
-              </div>
-              <input data-act="title" value="${safeTitle}" placeholder="Lesson title" style="margin-top:8px;" />
-            </div>
-
-            <div class="urlCol" style="min-width:0;">
-              <div class="miniLine"><span class="mono">YouTube link</span></div>
-              <input data-act="url" value="${safeUrl}" placeholder="Paste a YouTube URL…" style="margin-top:8px;" />
-            </div>
-
-            <div class="actionsCol" style="display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap: wrap;">
-              <button class="miniBtn" data-act="up">↑</button>
-              <button class="miniBtn" data-act="down">↓</button>
-              <button class="miniBtn" data-act="play">Play</button>
-              <button class="miniBtn miniDanger" data-act="del">Delete</button>
-            </div>
-          `;
-
-          // completion
-          row.querySelector('input[type="checkbox"]').addEventListener("change", (e) => {
-            updateLesson(m.id, l.id, { completed: !!e.target.checked });
-          });
-
-          // title/url edits
-          row.querySelector('[data-act="title"]').addEventListener("input", (e) => {
-            updateLesson(m.id, l.id, { title: e.target.value });
-          });
-
-          row.querySelector('[data-act="url"]').addEventListener("input", (e) => {
-            const url = e.target.value.trim();
-            const vid = extractVideoId(url);
-            updateLesson(m.id, l.id, { url, videoId: vid || "" });
-          });
-
-          // move/delete/play
-          row.querySelector('[data-act="up"]').addEventListener("click", () => moveLesson(m.id, li, -1));
-          row.querySelector('[data-act="down"]').addEventListener("click", () => moveLesson(m.id, li, +1));
-          row.querySelector('[data-act="del"]').addEventListener("click", () => removeLesson(m.id, l.id));
-          row.querySelector('[data-act="play"]').addEventListener("click", () => {
-            if (!l.videoId) return;
-            setPlaying(l.id);
-          });
-
-          // drag reorder
-          row.addEventListener("dragstart", (e) => {
-            row.classList.add("dragging");
-            e.dataTransfer.setData("text/plain", l.id);
-            e.dataTransfer.effectAllowed = "move";
-          });
-          row.addEventListener("dragend", () => row.classList.remove("dragging"));
-          row.addEventListener("dragover", (e) => e.preventDefault());
-          row.addEventListener("drop", (e) => {
-            e.preventDefault();
-            const fromId = e.dataTransfer.getData("text/plain");
-            const toId = l.id;
-            if (!fromId || fromId === toId) return;
-            reorderLessonById(m.id, fromId, toId);
-          });
-
-          lessonsEl.appendChild(row);
-        });
-      }
-
-      els.modules.appendChild(mod);
-    });
-
-    renderPlayerOnly();
-    renderSidebarOnly();
-  }
-
-  // ---------- events ----------
-  els.newCourseBtn.addEventListener("click", newCourse);
-  els.courseSearch.addEventListener("input", renderSidebarOnly);
-
-  els.courseTitle.addEventListener("input", (e) => updateCourseTitle(e.target.value));
-
-  els.addBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    const targetModuleId = els.moduleSelect.value || (c.modules && c.modules[0] && c.modules[0].id);
-    if (!targetModuleId) return;
-    addLessonsToModule(targetModuleId);
-  });
-
-  els.addModuleBtn.addEventListener("click", addModule);
-
-  els.startWatchingBtn.addEventListener("click", resume);
-  els.prevBtn.addEventListener("click", () => playerPrevNext(-1));
-  els.nextBtn.addEventListener("click", () => playerPrevNext(+1));
-
-  els.exportCourseBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    const blob = new Blob([JSON.stringify({ version: 1, course: c }, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = (c && c.title ? c.title : "course").replace(/[^\w\-]+/g, "_").slice(0,40) + ".json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-
-  els.deleteCourseBtn.addEventListener("click", () => {
-    const c = activeCourse();
-    if (!c) return;
-    deleteCourse(c.id);
-  });
-
-  els.exportLibraryBtn.addEventListener("click", exportLibrary);
-  els.importLibraryBtn.addEventListener("click", importLibrary);
-
-  // Sign out button
+  // Sign out
   document.getElementById('signOutBtn').addEventListener('click', async () => {
     try {
       await signOut(auth);
-      updateSyncStatus("Signed out");
-      // Clear local data
-      lib = normalizeLib(seedLib());
-      localStorage.setItem(LIB_KEY, JSON.stringify(lib));
-      render();
+      lib = { activeId: "", courses: [] };
+      localStorage.clear();
     } catch (error) {
-      console.error('Sign out error:', error);
       alert('Failed to sign out');
     }
   });
 
-  // initial
-  render();
+  // Render functions
+  function renderCourses() {
+    const mainContent = document.getElementById('mainContent');
+    const courses = lib.courses || [];
+
+    if (courses.length === 0) {
+      mainContent.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <h2 class="empty-title">No courses yet</h2>
+          <p class="empty-text">Create your first course to start learning</p>
+          <button class="btn btn-primary" id="createFirstCourseBtn">Create Course</button>
+        </div>
+      `;
+      
+      document.getElementById('createFirstCourseBtn').addEventListener('click', openAddCourseModal);
+      return;
+    }
+
+    const inProgress = courses.filter(c => {
+      const { completed, total } = getCourseProgress(c);
+      return completed < total && completed > 0;
+    });
+
+    const notStarted = courses.filter(c => {
+      const { completed } = getCourseProgress(c);
+      return completed === 0;
+    });
+
+    const completed = courses.filter(c => {
+      const { completed, total } = getCourseProgress(c);
+      return completed === total && total > 0;
+    });
+
+    mainContent.innerHTML = `
+      <div class="page-header">
+        <h1 class="page-title">My Content</h1>
+        <p class="page-subtitle">Continue your learning journey</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-content">
+            <h3>Total Courses</h3>
+            <p>${courses.length}</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">▶️</div>
+          <div class="stat-content">
+            <h3>In Progress</h3>
+            <p>${inProgress.length}</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h3>Completed</h3>
+            <p>${completed.length}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All Courses</button>
+        <button class="filter-tab" data-filter="progress">In Progress</button>
+        <button class="filter-tab" data-filter="completed">Completed</button>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">Courses</h2>
+        <button class="btn btn-primary" id="addCourseBtn">+ Create Course</button>
+      </div>
+
+      <div class="course-grid" id="courseGrid"></div>
+    `;
+
+    document.getElementById('addCourseBtn').addEventListener('click', openAddCourseModal);
+    
+    renderCourseGrid(courses);
+  }
+
+  function renderCourseGrid(courses) {
+    const grid = document.getElementById('courseGrid');
+    grid.innerHTML = '';
+
+    courses.forEach(course => {
+      const { total, completed, percentage } = getCourseProgress(course);
+      const totalMinutes = total * 5; // Assuming 5 min per lesson
+
+      const gradients = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+      ];
+      
+      const gradient = gradients[courses.indexOf(course) % gradients.length];
+
+      const card = document.createElement('div');
+      card.className = 'course-card';
+      card.innerHTML = `
+        <div class="course-thumbnail" style="background: ${gradient};">
+          📚
+          <span class="course-duration">${formatDuration(totalMinutes)}</span>
+        </div>
+        <div class="course-content">
+          <div class="course-type">Course</div>
+          <h3 class="course-title">${course.title || 'Untitled Course'}</h3>
+          <div class="course-meta">
+            <span>${total} lessons</span>
+            <span class="course-meta-dot"></span>
+            <span>${course.modules?.length || 0} modules</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${percentage}%"></div>
+          </div>
+          <div class="progress-text">${completed} of ${total} lessons complete</div>
+          <div class="course-actions">
+            <button class="btn btn-primary btn-small">Continue</button>
+            <button class="btn btn-secondary btn-small">⋯</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.btn-primary').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCourse(course.id);
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  function openCourse(courseId) {
+    alert('Course player coming soon!');
+  }
+
+  // Add Course Modal
+  const addCourseModal = document.getElementById('addCourseModal');
+
+  function openAddCourseModal() {
+    addCourseModal.classList.add('open');
+  }
+
+  document.getElementById('cancelCourseBtn').addEventListener('click', () => {
+    addCourseModal.classList.remove('open');
+  });
+
+  document.getElementById('saveCourseBtn').addEventListener('click', () => {
+    const title = document.getElementById('newCourseTitle').value.trim();
+    const urls = document.getElementById('newCourseUrls').value.split('\n')
+      .map(u => u.trim())
+      .filter(Boolean);
+
+    if (!title) {
+      alert('Please enter a course title');
+      return;
+    }
+
+    const lessons = urls.map(url => {
+      const videoId = extractVideoId(url);
+      return {
+        id: uid(),
+        videoId: videoId || '',
+        url: url,
+        title: 'Lesson',
+        completed: false,
+        watched: false,
+        understood: false,
+        notes: ''
+      };
+    });
+
+    const newCourse = {
+      id: uid(),
+      title: title,
+      lastLessonId: '',
+      modules: [{
+        id: uid(),
+        title: 'Module 1',
+        lessons: lessons
+      }]
+    };
+
+    lib.courses = [newCourse, ...(lib.courses || [])];
+    lib.activeId = newCourse.id;
+    saveLib();
+    
+    addCourseModal.classList.remove('open');
+    document.getElementById('newCourseTitle').value = '';
+    document.getElementById('newCourseUrls').value = '';
+    
+    renderCourses();
+  });
 </script>
 </body>
 </html>
