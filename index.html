@@ -1080,7 +1080,121 @@ https://youtube.com/watch?v=..."></textarea>
   }
 
   function openCourse(courseId) {
-    alert('Course player coming soon!');
+    lib.activeId = courseId;
+    const course = lib.courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const lessons = (course.modules || []).flatMap(m => m.lessons || []);
+    const { total, completed, percentage } = getCourseProgress(course);
+    
+    // Find the lesson to play (last played or first incomplete)
+    let playingLesson = null;
+    if (course.lastLessonId) {
+      playingLesson = lessons.find(l => l.id === course.lastLessonId);
+    }
+    if (!playingLesson) {
+      playingLesson = lessons.find(l => !l.completed) || lessons[0];
+    }
+
+    const mainContent = document.getElementById('mainContent');
+    mainContent.innerHTML = `
+      <div style="margin-bottom: 16px;">
+        <button class="btn btn-secondary" id="backToCoursesBtn">← Back to Courses</button>
+      </div>
+
+      <div class="player-container">
+        <div class="video-wrapper" id="videoWrapper">
+          ${playingLesson && playingLesson.videoId ? 
+            `<iframe src="https://www.youtube.com/embed/${playingLesson.videoId}?rel=0" 
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                     allowfullscreen></iframe>` :
+            `<div class="video-placeholder">
+              <div style="font-size: 48px; margin-bottom: 16px;">📺</div>
+              <div>Select a lesson to start watching</div>
+            </div>`
+          }
+        </div>
+
+        <div class="player-controls">
+          <h2 class="player-title">${course.title || 'Untitled Course'}</h2>
+          <div class="player-meta">
+            <span>${completed} of ${total} lessons complete</span>
+            <span>•</span>
+            <span>${percentage}% complete</span>
+          </div>
+        </div>
+
+        <div class="lesson-list" id="lessonList"></div>
+      </div>
+    `;
+
+    document.getElementById('backToCoursesBtn').addEventListener('click', renderCourses);
+
+    renderLessonList(course, playingLesson);
+  }
+
+  function renderLessonList(course, currentLesson) {
+    const lessonListEl = document.getElementById('lessonList');
+    lessonListEl.innerHTML = '';
+
+    (course.modules || []).forEach((module, moduleIndex) => {
+      if (module.lessons && module.lessons.length > 0) {
+        // Module header
+        const moduleHeader = document.createElement('div');
+        moduleHeader.style.cssText = 'padding: 12px 16px; font-weight: 600; font-size: 14px; color: var(--text-secondary); background: rgba(0,0,0,0.02);';
+        moduleHeader.textContent = `${moduleIndex + 1}. ${module.title || 'Module'}`;
+        lessonListEl.appendChild(moduleHeader);
+
+        // Lessons
+        module.lessons.forEach((lesson, lessonIndex) => {
+          const isActive = currentLesson && currentLesson.id === lesson.id;
+          
+          const lessonItem = document.createElement('div');
+          lessonItem.className = 'lesson-item' + (isActive ? ' active' : '');
+          
+          lessonItem.innerHTML = `
+            <div class="lesson-checkbox ${lesson.completed ? 'checked' : ''}">
+              ${lesson.completed ? '✓' : ''}
+            </div>
+            <div class="lesson-info">
+              <div class="lesson-title">${lessonIndex + 1}. ${lesson.title || 'Lesson'}</div>
+              <div class="lesson-duration">${lesson.videoId ? 'Video ID: ' + lesson.videoId : 'No video'}</div>
+            </div>
+            <button class="btn btn-small ${isActive ? 'btn-secondary' : 'btn-primary'}">
+              ${isActive ? 'Playing' : 'Play'}
+            </button>
+          `;
+
+          lessonItem.querySelector('.lesson-checkbox').addEventListener('click', (e) => {
+            e.stopPropagation();
+            lesson.completed = !lesson.completed;
+            saveLib();
+            openCourse(course.id);
+          });
+
+          lessonItem.querySelector('.btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (lesson.videoId) {
+              course.lastLessonId = lesson.id;
+              lesson.watched = true;
+              saveLib();
+              openCourse(course.id);
+            }
+          });
+
+          lessonItem.addEventListener('click', () => {
+            if (lesson.videoId) {
+              course.lastLessonId = lesson.id;
+              lesson.watched = true;
+              saveLib();
+              openCourse(course.id);
+            }
+          });
+
+          lessonListEl.appendChild(lessonItem);
+        });
+      }
+    });
   }
 
   // Add Course Modal
