@@ -766,7 +766,10 @@
 
       <div class="sideFooter">
         <div class="muted" id="libraryMeta">0 courses</div>
-        <div style="display:flex; gap:8px;">
+        <div class="muted" id="syncStatus" style="opacity: 0.6; font-size: 11px; margin-top: 4px;">
+          🔄 Firebase Sync Active
+        </div>
+        <div style="display:flex; gap:8px; margin-top: 8px;">
           <button class="btn btnGhost" id="exportLibraryBtn">Export</button>
           <button class="btn btnGhost" id="importLibraryBtn">Import</button>
         </div>
@@ -859,7 +862,7 @@
             </div>
 
             <div class="muted" style="margin-top:8px;">
-              Tracking is stored in this browser (localStorage).
+              Synced to Firebase Cloud ☁️ + Local storage backup
             </div>
           </div>
         </div>
@@ -894,8 +897,28 @@
     </div>
   </div>
 
-<script>
+<script type="module">
+  // Firebase imports
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsE9NRAyzHtxg_ffN4AJK8hO3wp971MlY",
+    authDomain: "study-mate-eed8f.firebaseapp.com",
+    projectId: "study-mate-eed8f",
+    storageBucket: "study-mate-eed8f.firebasestorage.app",
+    messagingSenderId: "977101066516",
+    appId: "1:977101066516:web:84d3162b5ff954430a3201"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   const LIB_KEY = "study_mate_library_v1";
+  const FIREBASE_SYNC_ENABLED = true; // Set to false to disable Firebase sync
+  const USER_ID = "default_user"; // In production, this would be from authentication
 
   const els = {
     // sidebar
@@ -1031,7 +1054,76 @@
 
   function saveLib(){
     localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+    if (FIREBASE_SYNC_ENABLED) {
+      syncToFirebase();
+    }
     render();
+  }
+
+  // Firebase sync functions
+  async function syncToFirebase() {
+    if (!FIREBASE_SYNC_ENABLED || !db) return;
+    try {
+      const userDocRef = doc(db, "users", USER_ID);
+      await setDoc(userDocRef, {
+        library: lib,
+        lastSync: serverTimestamp()
+      });
+      console.log("✅ Synced to Firebase");
+      updateSyncStatus("Synced");
+    } catch (error) {
+      console.error("❌ Firebase sync error:", error);
+      updateSyncStatus("Sync failed");
+    }
+  }
+
+  async function loadFromFirebase() {
+    if (!FIREBASE_SYNC_ENABLED || !db) return null;
+    try {
+      const userDocRef = doc(db, "users", USER_ID);
+      const docSnap = await getDoc(userDocRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        console.log("✅ Loaded from Firebase");
+        return data.library;
+      }
+      return null;
+    } catch (error) {
+      console.error("❌ Firebase load error:", error);
+      return null;
+    }
+  }
+
+  function updateSyncStatus(status) {
+    const statusEl = document.getElementById("syncStatus");
+    if (statusEl) {
+      statusEl.textContent = status;
+      statusEl.style.opacity = "1";
+      setTimeout(() => {
+        statusEl.style.opacity = "0.6";
+      }, 2000);
+    }
+  }
+
+  // Setup real-time sync listener
+  function setupFirebaseListener() {
+    if (!FIREBASE_SYNC_ENABLED || !db) return;
+    const userDocRef = doc(db, "users", USER_ID);
+    onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        const cloudLib = normalizeLib(data.library);
+        // Only update if cloud version is different
+        const currentString = JSON.stringify(lib);
+        const cloudString = JSON.stringify(cloudLib);
+        if (currentString !== cloudString) {
+          lib = cloudLib;
+          localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+          render();
+          console.log("🔄 Real-time update from Firebase");
+        }
+      }
+    });
   }
 
   // ✅ normalize saved data so .modules/.lessons exist + tracking fields exist
@@ -1126,8 +1218,21 @@
   }
 
   // ---------- state ----------
+  // Initialize library (will be replaced with Firebase data if available)
   let lib = normalizeLib(loadLib() ?? seedLib());
   localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+
+  // Load from Firebase on startup
+  (async function initFirebase() {
+    const firebaseLib = await loadFromFirebase();
+    if (firebaseLib) {
+      lib = normalizeLib(firebaseLib);
+      localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+      render();
+      console.log("📥 Loaded from Firebase on startup");
+    }
+    setupFirebaseListener();
+  })();
 
   let playingLessonId = ""; // UI state only
 
